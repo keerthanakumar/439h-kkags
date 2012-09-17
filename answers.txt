@@ -3,3 +3,9 @@ ags799
 Lab 1
 
 1. The processor starts executing 32-bit code after the ljmp instruction at 0x7c2d. This ljmp instruction jumps to a 32-bit code segment. The lgdt instruction previous to the ljmp instruction prepared the global descriptor table (gdt) that enables 32-bit mode. The sequence of movl, orl, and movl directly before the ljmp set the protected mode bit of control register 0 (cr0) so that the hardware knows to run in protected mode.
+
+2. The last executed instruction of the boot loader is "call *0x10018". The first instruction of the kernel is "movw $0x1234,0x472".
+
+3. The first instruction of the kernel is at address 0x1000c.
+
+4. The first sector that the boot loader reads off of the disk should be the ELF header. It first checks that this sector is a valid ELF header. If it is valid, the boot loader can then read ELFHDR->e_phnum to get the number of sectors to read. In other words, the ELF header tells the boot loader how many sectors it must read in order to fetch the entire kernel from disk.
