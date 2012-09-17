@@ -11,11 +11,6 @@ main(int argc, char **argv)
 {
   int x = 1;
   printf("Hello x = %d\n", x);
-  
-  //
-  // Put in-line assembly here to increment
-  // the value of x by 1 using in-line assembly
-  //
 
   //CHANGE
   asm("incl	28(%esp)");
