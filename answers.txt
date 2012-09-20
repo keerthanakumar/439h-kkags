@@ -13,3 +13,54 @@ Lab 1
 5. Before the boot loader enters the kernel these 8 words of memory are all null. After the boot loader enters the kernel some of them contain data. This is because the boot loader loads the kernel code into this memory.
 
 6. The kernel code is at address 0X00100000 at the second breakpoint.
+
+7. The first instruction that would fail is the first instruction directly after the new mapping is established, "mov $relocated, %eax". Incorrect data is loaded into %eax, and this causes the next instruction, "jmp *%eax", to operate incorrectly and the program to fail.
+
+8. printf.c interfaces with console.c via cputchar(int). It allows printf to print one character to the screen at a time.
+
+9. If the position of the cursor is past the bottom right of the screen (crt_pos >= CRT_SIZE), this code segment will move existing lines on the screen one row up (the memmove call), create a blank line at the bottom of the screen (the for loop), and bring the cursor to the bottom left of the screen (crt_pos -= CRT_COLS).
+
+10. fmt points at the format string ("x %d..."). ap points at x (if you increment ap it will point at y, and if you increment it again it will point at z).
+The calls:
+vcprintf(pointer to format string, pointer to x)
+cons_putc('x')
+cons_putc(' ')
+va_arg(), before call points to x = 1, after call points to y = 3
+cons_putc('1')
+cons_putc(',')
+cons_putc(' ')
+cons_putc('y')
+cons_putc(' ')
+va_arg(), before call points to y = 3, after call points to z = 4
+cons_putc('3')
+cons_putc(',')
+cons_putc(' ')
+cons_putc('z')
+va_arg(), before call points to z = 4, after call points to one after z (garbage)
+cons_putc('4')
+cons_putc('\n')
+
+11. The output is "He110 World".
+The calls:
+vcprintf(pointer to format string, pointer to address of 57616)
+cons_putc('H')
+va_arg(), before call points to address of 57616, after call points to address of i's address
+cons_putc('e')
+cons_putc('1')
+cons_putc('1')
+cons_putc('0')
+cons_putc(' ')
+cons_putc('W')
+cons_putc('o')
+cons_putc('r')
+cons_putc('l')
+cons_putc('d')
+i would need to be 0x726c6400. You would not need to change 57616.
+
+12. After obtaining the 3, va_args will advance a pointer to the next int in the argument list. However, because 3 is the last argument in the list, this pointer will be pointing at garbage. Therefore, garbage will be printed after the "y=".
+
+13. You could pass cprintf the number of arguments. Then it would be able to advance ap to the last argument, and after each argument had been accessed ap could be moved back to the previous argument. Furthermore, this would allow the program to realize if it had run out of arguments, and the problem described in question 12 would not be an issue.
+
+14. I do not know how the kernel reserves space for its stack. The stack pointer is initialized to the top end (most high memory address) of this reserved area.
+
+15. Each recursive nesting level of test_backtrace pushes 4 32-bit words on the stack. It pushes the caller's %ebp, the caller's %ebx, the int x argument for the next test_backtrace, and its next %eip. CHECK THIS.
