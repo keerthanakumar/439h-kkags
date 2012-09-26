@@ -61,6 +61,10 @@ i would need to be 0x726c6400. You would not need to change 57616.
 
 13. You could pass cprintf the number of arguments. Then it would be able to advance ap to the last argument, and after each argument had been accessed ap could be moved back to the previous argument. Furthermore, this would allow the program to realize if it had run out of arguments, and the problem described in question 12 would not be an issue.
 
-14. I do not know how the kernel reserves space for its stack. The stack pointer is initialized to the top end (most high memory address) of this reserved area.
+14. In obj/kern/kernel.sym bootstack is defined to be f0108000. In entry.S the label bootstack includes a directive .space. This directive reserves the space from 0xf0108000 to 0xf0110000 for bootstack. The stack pointer is initialized to point to 0xf0110000. This makes sense because the stack will grow downward (toward 0xf0108000, which will put the body of the stack into the reserved space).
 
-15. Each recursive nesting level of test_backtrace pushes 4 32-bit words on the stack. It pushes the caller's %ebp, the caller's %ebx, the int x argument for the next test_backtrace, and its next %eip. CHECK THIS.
+15. Each recursive nesting level of test_backtrace pushes 8 32-bit words on the stack. It pushes the caller's %ebp, the caller's %ebx, three blank 32-bit words, the int x argument it was given, the int x argument for the next test_backtrace, and its next %eip.
+
+16. The name of the first commit is "Lab 1 files".
+
+17. The name of the committed merge is "git-lab/mergeB".
