@@ -3,3 +3,47 @@ ags799
 Lab 2
 
 1. Variable x should have type uintptr_t. char* value is a pointer which ought to be able to be dereferenced, and if this was set as a physaddr_t then that would not be possible.
+
+2.
+Entry	Base V'l Addr	Points to
+1023	0xffc00000	page table for top 4MB of phys memory
+1022	0xff800000	extended memory
+1021	0xff400000	extended memory
+.	.		.
+.	.		.
+.	.		.
+316	0x28000000	extended memory
+315	0x4f000000	extended memory
+314	0x4e800000	kernel
+313	0x4e400000	kernel
+.	.		.
+.	.		.
+.	.		.
+257	0x40000000	kernel
+256	0x3fc00000	kernel
+255	0x3f800000	IO hole
+254	0x3f400000	IO hole
+.	.		.
+.	.		.
+.	.		.
+161	0x28400000	IO hole
+160	0x28000000	IO hole
+159	0x27c00000	base memory
+158	0x27800000	base memory
+.	.		.
+.	.		.
+.	.		.
+2	0x00800000	base memory
+1	0x00400000	base memory
+0	0x00000000	real-mode IDT and BIOS structures
+
+3. Permission bits in the page table entries specify whether or not memory can be read or written by the kernel or user, or at all accessed by the user.
+
+4. 4KB pages * 16,639 pages = (approx) 65MB. 
+
+5. 65MB / 4KB pages = 16640 page table entries. 16640 page table entries / 1024 page table entries per page table = 16.25 page tables, which rounds to 17 page tables. There's a 1024-entry page directory with 32-bit pointers at each entry, which is 4KB. There are 17 page tables with 4KB each. 4KB * 18 = 72KB.
+
+6. After the pair of instructions "mov $relocated, %eax" and "jmp *%eax", we transition to running an EIP above KERNBASE. It is possible to continue executing at a low EIP because of the one-to-one mapping between virtual addresses an physical addresses. Before the transition the EIP is pointing to the kernel. We need this transition so that it does not point to the kernel when we begin running C code.
+
+CHALLENGE PROBLEM:
+I did the last challenge problem. I added alloc_page, alloc_and_clear_page, page_status, free_page, print_page, and num_free_pages commands to the monitor. alloc_page and alloc_and_clear_page work very similarly in that they both allocate pages, but alloc_and_clear_page also will clear all entries within the page. page_status prints whether or not a page is allocated or not. free_page frees the page. print_page prints the page's refcount, virtual address, and physical address. num_free_pages prints the amount of free pages available. All of these functions, except for num_free_pages, can operate on multiple pages. If you provide alloc_page or alloc_and_clear_page with a numerical argument, they will allocate as many pages as you specify. If you provide multiple page pointers to page_status, free_page, or print_page, they will perform their operations on all of the pages that you list. My implementation of all of these functions is pretty straightforward - I just made to sure to include pmap.h in monitor.c and I was able to access all of the necessary functions.

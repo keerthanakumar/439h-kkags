@@ -24,6 +24,23 @@ static struct Page *page_free_list;	// Free list of physical pages
 // Detect machine's physical memory setup.
 // --------------------------------------------------------------
 
+//CHANGE
+extern int num_free_pages(void) {
+	struct Page* pp = page_free_list;
+	int count = 0;
+	if (!pp) {
+		return count;
+	}
+	else {
+		count++;
+		while ((pp = pp->pp_link)) {
+			count++;
+		}
+		return count;
+	}
+}
+//ENDCHANGE
+
 static int
 nvram_read(int r)
 {
@@ -269,10 +286,9 @@ page_init(void)
 	// free pages!
 	size_t i;
         //CHANGE
-        /*if (DEBUG) cprintf("\n\nnpages_basemem = %p, IOPHYSMEM / PGSIZE = %p, EXTPHYSMEM / PGSIZE = %p, KERN = %p, AFTER_KERN = %p, npages = %p\n\n", npages_basemem, IOPHYSMEM / PGSIZE, EXTPHYSMEM / PGSIZE, PADDR((void*)KERNBASE) / PGSIZE, (PADDR(boot_alloc(0)) / PGSIZE), npages);*/
         page_free_list = NULL;
         //physical page 0 is in use
-        pages[0].pp_link = NULL; //is this correct?
+        pages[0].pp_link = NULL;
         pages[0].pp_ref = 1;
 
         //base memory is free
@@ -288,25 +304,13 @@ page_init(void)
           pages[i].pp_ref = 1;
         }
 
-	/* THIS IS ALL FOR THE SPACE BETWEEN EXTPHYSMEM AND KERNBASE*/
-
-        //if (PADDR((void*)0xF1000000) != EXTPHYSMEM) panic("KERNBASE != EXTPHYSMEM\n");
-
-        /*//extended memory to kernel's start. marked as free
-        for (i = EXTPHYSMEM / PGSIZE; i < PADDR((void*)0xF1000000) / PGSIZE; i++) {
-          pages[i].pp_ref = 0;
-          pages[i].pp_link = page_free_list;
-          page_free_list = &pages[i];
-        }
-        if (DEBUG) cprintf("\n\nFREE EXT MEM HANDLED UP TO KERN\n\n");*/
-
         //marking the kernel as not free
-	for (/*i = PADDR((void*)0xF1000000) / PGSIZE*/ i = EXTPHYSMEM / PGSIZE; i < (PADDR(boot_alloc(0)) / PGSIZE); i++) {
+	for (i = EXTPHYSMEM / PGSIZE; i < (PADDR(boot_alloc(0)) / PGSIZE); i++) {
 		pages[i].pp_ref = 1;
 		pages[i].pp_link = NULL;
 	}
 
-        //marking the rest of memory as free
+        //marking the rest o•••••••••••••••f memory as free
         for (i = (PADDR(boot_alloc(0)) / PGSIZE); i < npages; i++) {
           pages[i].pp_ref = 0;
           pages[i].pp_link = page_free_list;
