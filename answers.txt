@@ -1,3 +1,5 @@
 Andrew Sharp
 ags799
 Lab 2
+
+1. Variable x should have type uintptr_t. char* value is a pointer which ought to be able to be dereferenced, and if this was set as a physaddr_t then that would not be possible.
