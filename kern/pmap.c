@@ -10,6 +10,8 @@
 #include <kern/kclock.h>
 #include <kern/env.h>
 
+#define DEBUG 1
+
 
 // These variables are set by i386_detect_memory()
 size_t npages;			// Amount of physical memory (in pages)
@@ -185,9 +187,8 @@ mem_init(void)
 	// Make 'envs' point to an array of size 'NENV' of 'struct Env'.
 	// LAB 3: Your code here.
 	//CHANGE
-	kern_pgdir[PDX(UENVS)] = PADDR(kern_pgdir) | PTE_U | PTE_P;	//set permissions to kern R, user R
+//	kern_pgdir[PDX(UENVS)] = PADDR(kern_pgdir) | PTE_U | PTE_P;	//set permissions to kern R, user R
 	envs = boot_alloc(NENV*sizeof(struct Env));	//allocate mem
-	memset((void*)kern_pgdir[PDX(UENVS)], 0, NENV*sizeof(struct Env));	//clear memory ???is this necessary???
 	//ENDCHANGE
 
 	//////////////////////////////////////////////////////////////////////
@@ -221,6 +222,7 @@ mem_init(void)
 	//    - the new image at UENVS  -- kernel R, user R
 	//    - envs itself -- kernel RW, user NONE
 	// LAB 3: Your code here.
+	boot_map_region(kern_pgdir, UENVS, ROUNDUP(NENV * sizeof(struct Env), PGSIZE), PADDR(envs), PTE_U | PTE_P);
 
 	//////////////////////////////////////////////////////////////////////
 	// Use the physical memory that 'bootstack' refers to as the kernel
@@ -800,8 +802,9 @@ check_kern_pgdir(void)
 
 	// check envs array (new test for lab 3)
 	n = ROUNDUP(NENV*sizeof(struct Env), PGSIZE);
-	for (i = 0; i < n; i += PGSIZE)
+	for (i = 0; i < n; i += PGSIZE) {
 		assert(check_va2pa(pgdir, UENVS + i) == PADDR(envs) + i);
+	}
 
 	// check phys mem
 	for (i = 0; i < npages * PGSIZE; i += PGSIZE)
