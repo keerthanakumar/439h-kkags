@@ -184,6 +184,11 @@ mem_init(void)
 	//////////////////////////////////////////////////////////////////////
 	// Make 'envs' point to an array of size 'NENV' of 'struct Env'.
 	// LAB 3: Your code here.
+	//CHANGE
+	kern_pgdir[PDX(UENVS)] = PADDR(kern_pgdir) | PTE_U | PTE_P;	//set permissions to kern R, user R
+	envs = boot_alloc(NENV*sizeof(struct Env));	//allocate mem
+	memset((void*)kern_pgdir[PDX(UENVS)], 0, NENV*sizeof(struct Env));	//clear memory ???is this necessary???
+	//ENDCHANGE
 
 	//////////////////////////////////////////////////////////////////////
 	// Now that we've allocated the initial kernel data structures, we set
