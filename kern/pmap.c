@@ -351,7 +351,6 @@ page_init(void)
 struct Page *
 page_alloc(int alloc_flags)
 {
-	// Fill this function in
         //CHANGE
 	if (!page_free_list) {
 		return NULL;
@@ -493,6 +492,8 @@ boot_map_region(pde_t *pgdir, uintptr_t va, size_t size, physaddr_t pa, int perm
 int
 page_insert(pde_t *pgdir, struct Page *pp, void *va, int perm)
 {
+	/*cprintf("page_insert, start: pgdir = %p, pp = %p, va = %p, perm = %p\n",
+		pgdir, pp, va, perm);*/
 	pte_t** pte_store = NULL;
 	//if there's already a page here, remove it
 	struct Page* qq;
