@@ -43,6 +43,23 @@
 
 .text
 
+_alltraps:
+	pushl %ds
+	pushl %es
+	pushal
+	movw $GD_KD, %ax
+	movw %ax, %ds
+	movw %ax, %es
+	pushl %esp
+	call trap
+
+	addl $4, %esp
+	popal
+	popl %es
+	popl %ds
+	addl $8, %esp
+	iret
+
 /*
  * Lab 3: Your code here for generating entry points for the different traps.
  */
@@ -564,8 +581,11 @@ vector:
 	.long vector250
 	.long vector251
 	.long vector252
-	.long vector253
 	.long vector254
 	.long vector255
+
+/*
+ * Lab 3: Your code here for _alltraps
+ */
 
 
