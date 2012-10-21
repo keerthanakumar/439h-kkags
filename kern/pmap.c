@@ -610,10 +610,29 @@ static uintptr_t user_mem_check_addr;
 // Returns 0 if the user program can access this range of addresses,
 // and -E_FAULT otherwise.
 //
+//pgdir_walk(pde_t *pgdir, const void *va, int create)
 int
 user_mem_check(struct Env *env, const void *va, size_t len, int perm)
 {
-	// LAB 3: Your code here.
+	uintptr_t start = (uintptr_t)va;
+	uintptr_t end = (uintptr_t)va+len;
+	if ((int)(va + len) > ULIM) {		//va+len maybe?
+		user_mem_check_addr = (uintptr_t)va;		
+		return -E_FAULT;
+	}
+
+		
+	for(; start < end; start++){
+		pte_t* page_table_entry = pgdir_walk(env->env_pgdir, (void*)start, 0);
+		if (!page_table_entry) {
+			user_mem_check_addr = start;
+			return -E_FAULT;
+		}
+		if((*page_table_entry & (perm|PTE_U)) != (perm|PTE_U)){
+			user_mem_check_addr = start;
+			return -E_FAULT;
+		}
+	}
 
 	return 0;
 }
