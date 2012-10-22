@@ -155,6 +155,7 @@ trap_dispatch(struct Trapframe *tf)
 	switch(tf->tf_trapno) {
 		case T_DEBUG:
 		case T_BRKPT:		//breakpoint exception
+//			cprintf("lol: %p\n", tf->tf_eip);
 			monitor(tf);
 			return;
 		case T_PGFLT:		//page fault exception
