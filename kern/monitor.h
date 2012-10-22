@@ -21,5 +21,7 @@ int mon_page_status(int argc, char **argv, struct Trapframe *tf);
 int mon_free_page(int argc, char **argv, struct Trapframe *tf);
 int mon_print_page(int argc, char **argv, struct Trapframe *tf);
 int mon_num_free_pages(int argc, char **argv, struct Trapframe *tf);
+int mon_c(int argc, char **argv, struct Trapframe *tf);
+int mon_si(int argc, char **argv, struct Trapframe *tf);
 
 #endif	// !JOS_KERN_MONITOR_H

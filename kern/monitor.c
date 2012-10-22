@@ -33,10 +33,23 @@ static struct Command commands[] = {
 	{ "free_page", "Manually free one or more pages", mon_free_page },
 	{ "print_page", "Print details of one or more pages", mon_print_page },
 	{ "num_free_pages", "Print number of free pages", mon_num_free_pages },
+	{ "c", "Continue execution of running user program", mon_c },
+	{ "si", "Execute next instruction of running user program", mon_si},
 };
 #define NCOMMANDS (sizeof(commands)/sizeof(commands[0]))
 
 //CHANGE
+int
+mon_si(int argc, char **argv, struct Trapframe *tf) {
+	tf->tf_eflags = tf->tf_eflags | FL_TF;
+	return -1;
+}
+
+int
+mon_c(int argc, char **argv, struct Trapframe *tf) {
+	return -1;
+}
+
 int
 mon_alloc_page(int argc, char **argv, struct Trapframe *tf) {
 	int num_pages = 1;

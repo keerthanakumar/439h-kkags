@@ -12,3 +12,6 @@ Lab3
 3. If the break point entry in the IDT was set with privilege level 0, int $3 will produce a general protection fault (as long as its being called by a user process, which is the case with breakpoint). However, if the break point entry in the IDT has privilege level 3, then a break point exception is generated. The user process is allowed to access int $3 in this case.
 
 4. The point of these mechanisms is to user certain exceptions to the kernel. If a page fault exception occurs, the kernel must be able to handle it, which means dealing with system-wide memory. This is a necessary ability for the system to function. However, user programs must not have access to this ability. This is just one example of why certain interrupts must be limited to kernel usage.
+
+CHALLENGE:
+
