@@ -14,4 +14,6 @@ Lab3
 4. The point of these mechanisms is to user certain exceptions to the kernel. If a page fault exception occurs, the kernel must be able to handle it, which means dealing with system-wide memory. This is a necessary ability for the system to function. However, user programs must not have access to this ability. This is just one example of why certain interrupts must be limited to kernel usage.
 
 CHALLENGE:
+We did the challenge that adds 'continue' and single-stepping functionality to the JOS monitor.
 
+We added mon_c and mon_si functions for 'c' and 'si' monitor commands, respectively. The mon_c function returns -1, which forces the monitor to exit and returns to execution of the user program. The mon_si function sets the trap flag of the struct Trapframe's EFLAGS, and then returns -1. By setting the trap flag, we cause the hardware to execute an 'int $1' after executing the next instruction of the user program. We modified our trap_dispatch function so that 'int $1' instructions are handled identically to 'int $3' instruction: they pause execution of the user program and start the JOS monitor.
