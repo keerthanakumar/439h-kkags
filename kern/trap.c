@@ -244,6 +244,7 @@ trap(struct Trapframe *tf)
 		// Acquire the big kernel lock before doing any
 		// serious kernel work.
 		// LAB 4: Your code here.
+		lock_kernel();
 		assert(curenv);
 
 		// Garbage collect if current enviroment is a zombie
@@ -259,6 +260,7 @@ trap(struct Trapframe *tf)
 		curenv->env_tf = *tf;
 		// The trapframe on the stack should be ignored from here on.
 		tf = &curenv->env_tf;
+		//unlock_kernel();
 	}
 
 	// Record that tf is the last real trapframe so
@@ -325,11 +327,43 @@ page_fault_handler(struct Trapframe *tf)
 	//   (the 'tf' variable points at 'curenv->env_tf').
 
 	// LAB 4: Your code here.
-
+	if (!curenv->env_pgfault_upcall){
 	// Destroy the environment that caused the fault.
-	cprintf("[%08x] user fault va %08x ip %08x\n",
-		curenv->env_id, fault_va, tf->tf_eip);
-	print_trapframe(tf);
-	env_destroy(curenv);
+		cprintf("[%08x] user fault va %08x ip %08x\n",
+			curenv->env_id, fault_va, tf->tf_eip);	
+		print_trapframe(tf);
+		env_destroy(curenv);
+	}
+	
+	user_mem_assert(curenv, (void*)(UXSTACKTOP - 4), 4, 0);
+
+	uintptr_t sp;
+	if (tf->tf_esp < UXSTACKTOP && tf->tf_esp >= UXSTACKTOP - PGSIZE) {
+		//already on UXSTACK
+		sp = tf->tf_esp - 4;
+	}
+	else {
+		//need to get on UXSTACK
+		sp = UXSTACKTOP;
+	}
+	if (sp - sizeof(struct UTrapframe) < UXSTACKTOP - PGSIZE) {
+		cprintf("[%08x] user fault va %08x ip %08x\n",
+			curenv->env_id, fault_va, tf->tf_eip);	
+		print_trapframe(tf);
+		env_destroy(curenv);
+	}
+	struct UTrapframe *u;
+	u = (struct UTrapframe*)(sp - sizeof(struct UTrapframe));
+	u->utf_fault_va = fault_va;
+	u->utf_err = tf->tf_err;
+	u->utf_regs = tf->tf_regs;
+	u->utf_eip = tf->tf_eip;
+	u->utf_eflags = tf->tf_eflags;
+	u->utf_esp = tf->tf_esp;
+	
+	tf->tf_esp = (uintptr_t) u;
+	tf->tf_eip = (uintptr_t) curenv->env_pgfault_upcall;
+	
+	env_run(curenv);
 }
 

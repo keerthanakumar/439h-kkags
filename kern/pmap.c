@@ -356,6 +356,8 @@ page_init(void)
           pages[i].pp_link = page_free_list;
           page_free_list = &pages[i];
         }
+	pages[MPENTRY_PADDR/PGSIZE].pp_ref = 1;
+	pages[MPENTRY_PADDR/PGSIZE].pp_link = NULL;
 	for (i = (MPENTRY_PADDR / PGSIZE) + 1; i < npages_basemem; i++){
 	  pages[i].pp_ref = 0;
           pages[i].pp_link = page_free_list;
@@ -670,7 +672,7 @@ mmio_map_region(physaddr_t pa, size_t size)
 	if (base + size > MMIOLIM) {
 		panic("pmap.c:mmio_map_region: not enough room in MMIO region");
 	}
-	boot_map_region(kern_pgdir, base, size, pa, PTE_PCD|PTE_PWT|PTE_W);
+	boot_map_region(kern_pgdir, base, size, pa, PTE_PCD|PTE_W); //PTE_PWT
 	uintptr_t b = base;
 	base += size;
 	return (void*)b;

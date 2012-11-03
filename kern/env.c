@@ -194,14 +194,15 @@ env_setup_vm(struct Env *e)
 	// LAB 3: Your code here.
 
 	e->env_pgdir = (pde_t *)page2kva(p);
+	memset(e->env_pgdir, 0, PGSIZE);
 	p->pp_ref++;
 	for (i = PDX(UTOP); i < PDX(UVPT);  i++) {
-		e->env_pgdir[i] = kern_pgdir[i] | PTE_P; //Should we have PTE_W ?
+		e->env_pgdir[i] = kern_pgdir[i] ; //Should we have PTE_W ?
 								       //might set to kern_pgdir
 	}	
 			
-	for (i = PDX(UVPT) + 1; i < PGSIZE; i++) {
-			e->env_pgdir[i] = kern_pgdir[i] | PTE_P; //Should we have PTE_W?
+	for (i = PDX(UVPT) + 1; i < NPDENTRIES; i++) {
+			e->env_pgdir[i] = kern_pgdir[i] ; //Should we have PTE_W?
 								       //might set to kern_pgdir
 	}
 	// UVPT maps the env's own page table read-only.
@@ -545,17 +546,22 @@ env_run(struct Env *e)
 
 	// LAB 3: Your code here.
 	if (curenv && curenv->env_status == ENV_RUNNING) {
+
 		curenv->env_status = ENV_RUNNABLE;
 	}
 	if (e->env_status == ENV_RUNNABLE) { //there's a lot of options here...
+
 		curenv = e;
 		curenv->env_status = ENV_RUNNING;
 		curenv->env_runs++;
+		unlock_kernel(); 
 		lcr3(PADDR(curenv->env_pgdir));
 		env_pop_tf(&(curenv->env_tf));
 	}
 	else {
+		unlock_kernel();
 		env_pop_tf(&(e->env_tf));
 		panic("env.c:env_run(): env is not runnable");
 	}
+
 }
