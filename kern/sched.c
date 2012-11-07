@@ -49,12 +49,18 @@ sched_yield(void)
 	// For debugging and testing purposes, if there are no
 	// runnable environments other than the idle environments,
 	// drop into the kernel monitor.
+	/*for (i = 0; i < NENV; i++) {
+	       nexteid = (firsteid + i) % NENV;
+	       if (envs[nexteid].env_type != ENV_TYPE_IDLE && envs[nexteid].env_status == ENV_RUNNING && envs[nexteid].env_cpunum == cpunum()) {
+		env_run(&envs[nexteid]);
+	}*/
 	for (i = 0; i < NENV; i++) {
 		if (envs[i].env_type != ENV_TYPE_IDLE &&
 		    (envs[i].env_status == ENV_RUNNABLE ||
-		     envs[i].env_status == ENV_RUNNING))
+	     	     envs[i].env_status == ENV_RUNNING))
 			break;
 	}
+	
 	if (i == NENV) {
 		cprintf("No more runnable environments!\n");
 		while (1)
