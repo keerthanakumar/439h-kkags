@@ -69,6 +69,7 @@ sys_env_destroy(envid_t envid) //Don't forget to modify syscall() to dispatch sy
 static void
 sys_yield(void)
 {
+	//cprintf("sys_yield called\n");
 	sched_yield();
 }
 
@@ -340,8 +341,6 @@ static int
 sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
 {
 	// LAB 4: Your code here.
-	cprintf("sys_ipc_try_send, start: envid = %d, value = %d, srcva = %p, perm = %d\n",
-		envid, value, srcva, perm);
 	struct Env *e;
 	struct Page *p;
 	pte_t *pte;
@@ -350,8 +349,9 @@ sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
 		cprintf("\tbad env\n");
 		return -E_BAD_ENV;
 	}
+	//cprintf("SEND e->env_id = %x, e->env_ipc_recv = %d\n", e->env_id, e->env_ipc_recving);
 	if (e->env_ipc_recving == 0) {
-		cprintf("\tenv doesn't want to receive\n");
+		//cprintf("\tenv doesn't want to receive\n");
 		return -E_IPC_NOT_RECV;
 	}
 	if (e->env_status != ENV_NOT_RUNNABLE) {
@@ -388,6 +388,9 @@ sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
 	e->env_ipc_from = curenv->env_id;
 	e->env_ipc_value = value;
 	e->env_status = ENV_RUNNABLE;
+	//cprintf("sender: done\n");
+	//cprintf("sys_ipc_try_send, start: envid = %d, value = %d, srcva = %p, perm = %d\n",
+		//envid, value, srcva, perm);
 	return 0;
 }
 
@@ -406,15 +409,22 @@ static int
 sys_ipc_recv(void *dstva)
 {
 	// LAB 4: Your code here.
-	cprintf("sys_ipc_recv, start: dstva = %p\n", dstva);
+	//cprintf("sys_ipc_recv, start: dstva = %p\n", dstva);
+	//cprintf("RECV thisenv = %x\n", curenv->env_id);
+	//panic("");
 	if(((uint32_t) dstva < UTOP) && ((uint32_t) dstva % PGSIZE != 0)){
 		cprintf("sys_ipc_recv: dstva is not page-aligned\n");
 		return -E_INVAL;
 	}
 	curenv->env_ipc_dstva = dstva;
 	curenv->env_ipc_recving = 1;
+	//cprintf("curenvid = %x\n", curenv->env_id);
+	//panic("");
 	curenv->env_status = ENV_NOT_RUNNABLE;
+	//cprintf("recv: sysyield\n");
+	curenv->env_tf.tf_regs.reg_eax = 0;
 	sys_yield();
+	//cprintf("sys_ipc_recv, progress\n");
 	
 
 	return 0;
