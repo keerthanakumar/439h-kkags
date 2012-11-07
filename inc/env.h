@@ -44,6 +44,13 @@ enum EnvType {
 	ENV_TYPE_IDLE,
 };
 
+//Challenge Problem Enum
+enum EnvPriority {
+	LOW_PRI = 0,
+	MED_PRI,
+	HI_PRI,
+};
+
 struct Env {
 	struct Trapframe env_tf;	// Saved registers
 	struct Env *env_link;		// Next free Env
@@ -68,7 +75,7 @@ struct Env {
 	int env_ipc_perm;		// Perm of page mapping received
 	
 	//ENV priority
-	int env_priority;		//Fixed priority scheduler for Envs
+	enum EnvPriority env_priority;		//Fixed priority scheduler for Envs
 };
 
 #endif // !JOS_INC_ENV_H

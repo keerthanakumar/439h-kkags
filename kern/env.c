@@ -131,7 +131,7 @@ env_init(void)
 		envs[i].env_runs = 0;
 		envs[i].env_link = env_free_list;
 		envs[i].env_pgdir = NULL;
-		envs[i].env_priority = 1;
+		envs[i].env_priority = LOW_PRI;
 		env_free_list = &envs[i];
 	}
 
@@ -222,7 +222,7 @@ env_setup_vm(struct Env *e)
 // algorithm.
 int
 env_alloc(struct Env **newenv_store, envid_t parent_id) {
-	return env_alloc_p(newenv_store, parent_id, 1);
+	return env_alloc_p(newenv_store, parent_id, LOW_PRI);
 }
 
 //
@@ -234,7 +234,7 @@ env_alloc(struct Env **newenv_store, envid_t parent_id) {
 //	-E_NO_MEM on memory exhaustion
 //
 int
-env_alloc_p(struct Env **newenv_store, envid_t parent_id, int envpriority)
+env_alloc_p(struct Env **newenv_store, envid_t parent_id, enum EnvPriority envpriority)
 {
 	int32_t generation;
 	int r;
