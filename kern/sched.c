@@ -52,6 +52,8 @@ sched_yield(void)
 		if (numRuns && curenv->env_type != ENV_TYPE_IDLE &&
 			curenv->env_status == ENV_RUNNING) {
 			numRuns--;
+			if (numRuns == 0)
+				curenv->env_priority--;
 			env_run(curenv);
 		}
 
