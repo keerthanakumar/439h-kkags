@@ -340,35 +340,55 @@ static int
 sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
 {
 	// LAB 4: Your code here.
+	cprintf("sys_ipc_try_send, start: envid = %d, value = %d, srcva = %p, perm = %d\n",
+		envid, value, srcva, perm);
 	struct Env *e;
 	struct Page *p;
 	pte_t *pte;
 
-	if(envid2env(envid, &e, 0) < 0)
+	if(envid2env(envid, &e, 0) < 0) {
+		cprintf("\tbad env\n");
 		return -E_BAD_ENV;
-	if (e->env_ipc_recving == 0)
+	}
+	if (e->env_ipc_recving == 0) {
+		cprintf("\tenv doesn't want to receive\n");
 		return -E_IPC_NOT_RECV;
+	}
+	if (e->env_status != ENV_NOT_RUNNABLE) {
+		cprintf("\tenv NOT RUNNABLE\n");
+		return -E_IPC_NOT_RECV;
+		
+	}
 
 	if((uint32_t) e->env_ipc_dstva < UTOP && (uint32_t) srcva < UTOP){
-		p = page_lookup(curenv->env_pgdir, srcva, &pte);
-		
-		if(!p)
+		cprintf("\tenv wants a page\n");
+		if ((int)srcva % PGSIZE != 0) {
 			return -E_INVAL;
+		}
+		if ((p = page_lookup(curenv->env_pgdir, srcva, &pte)) < 0) {
+			return -E_INVAL;
+		}
 		
-		if((perm & PTE_W) && (*pte & PTE_W) == 0)
+		/*if(!p)
+			return -E_INVAL;*/
+		
+		if((perm & PTE_W) && ((*pte & PTE_W) == 0))
 			return -E_INVAL;
 		
 		if((page_insert(e->env_pgdir, p, e->env_ipc_dstva, perm)) < 0)
 			return -E_NO_MEM;
+		e->env_ipc_perm = perm;
+	}
+	else {
+		cprintf("\tenv doesn't want a page\n");
+		e->env_ipc_perm = 0;
 	}
 	e->env_ipc_recving = 0;
-	e->env_ipc_dstva = (void*) UTOP;
+	//e->env_ipc_dstva = (void*) UTOP;
 	e->env_ipc_from = curenv->env_id;
-	e->env_ipc_perm = perm;
 	e->env_ipc_value = value;
 	e->env_status = ENV_RUNNABLE;
 	return 0;
-	//panic("sys_ipc_try_send not implemented");
 }
 
 // Block until a value is ready.  Record that you want to receive
@@ -386,17 +406,16 @@ static int
 sys_ipc_recv(void *dstva)
 {
 	// LAB 4: Your code here.
-	
+	cprintf("sys_ipc_recv, start: dstva = %p\n", dstva);
 	if(((uint32_t) dstva < UTOP) && ((uint32_t) dstva % PGSIZE != 0)){
+		cprintf("sys_ipc_recv: dstva is not page-aligned\n");
 		return -E_INVAL;
 	}
 	curenv->env_ipc_dstva = dstva;
 	curenv->env_ipc_recving = 1;
-	curenv->env_ipc_value = 0;
-	curenv->env_ipc_from = 0;
-	curenv->env_ipc_perm = 0;
-	
 	curenv->env_status = ENV_NOT_RUNNABLE;
+	sys_yield();
+	
 
 	return 0;
 

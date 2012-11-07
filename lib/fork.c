@@ -27,9 +27,9 @@ pgfault(struct UTrapframe *utf)
 	//   (see <inc/memlayout.h>).
 
 	// LAB 4: Your code here.
-	if ((err & FEC_WR) == 0) {
+	/*if ((err & FEC_WR) == 0) {
 		panic("faulting access was not a write");
-	}
+	}*/
 	pte_t pte = vpt[PGNUM((uint32_t)addr)];
 	if (!(pte & PTE_COW)) {
 		panic("faulting page was not COW");
