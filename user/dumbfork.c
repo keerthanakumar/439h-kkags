@@ -62,7 +62,6 @@ dumbfork(void)
 		thisenv = &envs[ENVX(sys_getenvid())];
 		return 0;
 	}
-	cprintf("progress\n");
 	// We're the parent.
 	// Eagerly copy our entire address space into the child.
 	// This is NOT what you should do in your fork implementation.

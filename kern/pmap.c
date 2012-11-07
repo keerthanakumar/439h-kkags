@@ -419,6 +419,7 @@ page_alloc(int alloc_flags)
 void
 page_free(struct Page *pp)
 {
+	if (pp->pp_ref != 0) cprintf("page_free: pp = %p, pp_ref = %d\n", pp, pp->pp_ref);
 	pp->pp_link = page_free_list;
 	page_free_list = pp;
 }
@@ -432,6 +433,7 @@ page_decref(struct Page* pp)
 {
 	if (--pp->pp_ref == 0)
 		page_free(pp);
+	//cprintf("\tpage_decref, post-dec: pp = %p, pp_ref = %d\n", pp, pp->pp_ref);
 }
 
 // Given 'pgdir', a pointer to a page directory, pgdir_walk returns
@@ -538,14 +540,31 @@ boot_map_region(pde_t *pgdir, uintptr_t va, size_t size, physaddr_t pa, int perm
 int
 page_insert(pde_t *pgdir, struct Page *pp, void *va, int perm)
 {
-	/*cprintf("page_insert, start: pgdir = %p, pp = %p, va = %p, perm = %p\n",
-		pgdir, pp, va, perm);*/
+/*	cprintf("page_insert\t");
+	pte_t *pte = pgdir_walk(pgdir, va, 0);
+	physaddr_t ppa = page2pa(pp);
+	
+	if (pte != NULL) {
+		if (*pte & PTE_P)
+			page_remove(pgdir, va);
+		if (page_free_list == pp)
+			page_free_list = page_free_list->pp_link;
+	}
+	else {
+		pte = pgdir_walk(pgdir, va, 1);
+		if (!pte)
+			return -E_NO_MEM;
+	}
+	*pte = page2pa(pp) | perm | PTE_P;
+	pp->pp_ref++;
+	tlb_invalidate(pgdir, va);
+	return 0;*/
 	pte_t** pte_store = NULL;
 	//if there's already a page here, remove it
 	struct Page* qq;
 	if ((qq = page_lookup(pgdir, va, pte_store))) {
 		if (qq == pp) { //it's already got the right page
-			pp->pp_ref = 0;
+			pp->pp_ref--;
 		}
 		else {
 			page_remove(pgdir, va);
@@ -556,6 +575,7 @@ page_insert(pde_t *pgdir, struct Page *pp, void *va, int perm)
 	if ((ptep = pgdir_walk(pgdir, va, 1))) {
 		tlb_invalidate(pgdir, va);
 		pp->pp_ref++;
+		//cprintf("pp = %p, pp_ref = %d\n", pp, pp->pp_ref);
 		*ptep = page2pa(pp) | perm | PTE_P;
 		return 0;
 	}
@@ -705,6 +725,7 @@ user_mem_check(struct Env *env, const void *va, size_t len, int perm)
 	uintptr_t start = (uintptr_t)va;
 	uintptr_t end = (uintptr_t)va+len;
 	if ((int)(va + len) > ULIM) {		//va+len maybe?
+		cprintf("\t\tuser_mem_check: va + len > ULIM\n");
 		user_mem_check_addr = (uintptr_t)va;		
 		return -E_FAULT;
 	}
@@ -713,15 +734,17 @@ user_mem_check(struct Env *env, const void *va, size_t len, int perm)
 	for(; start < end; start++){
 		pte_t* page_table_entry = pgdir_walk(env->env_pgdir, (void*)start, 0);
 		if (!page_table_entry) {
+			cprintf("\t\tuser_mem_check: !page_table_entry\n");
 			user_mem_check_addr = start;
 			return -E_FAULT;
 		}
 		if((*page_table_entry & (perm|PTE_U)) != (perm|PTE_U)){
+			cprintf("\t\tuser_mem_check: !page_table_entry\n");
 			user_mem_check_addr = start;
 			return -E_FAULT;
 		}
 	}
-
+	//cprintf("\t\tuser_mem_check: you're okay for va = %p & env = %p\n", va, env);
 	return 0;
 }
 

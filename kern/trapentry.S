@@ -585,8 +585,5 @@ vector:
 	.long vector254
 	.long vector255
 
-/*
- * Lab 3: Your code here for _alltraps
- */
 
 
