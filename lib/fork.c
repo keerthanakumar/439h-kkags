@@ -125,13 +125,8 @@ fork(void)
 	envid_t envid_ch;
 	set_pgfault_handler(pgfault);
 	if ((envid_ch = sys_exofork()) < 0) {
-		panic("unable to fork child process");
+		panic("unable to fork child process, envid_ch = %p", envid_ch);
 	}
-	//int lol;
-	//lol = sys_env_set_pgfault_upcall(envid_ch, thisenv->env_pgfault_upcall);
-	//cprintf("\nI am right now at la.. in fork(): lol = %d\n", lol);
-	//cprintf("\tsys_getenvid() = %d\n", sys_getenvid());
-	//cprintf("\tenvid_ch = %d\n", envid_ch);
 	if (envid_ch == 0) {
 		//cprintf("envid_ch == 0\n");
 		thisenv = &envs[ENVX(sys_getenvid())];

@@ -380,7 +380,7 @@ sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
 		e->env_ipc_perm = perm;
 	}
 	else {
-		cprintf("\tenv doesn't want a page\n");
+		//cprintf("\tenv doesn't want a page\n");
 		e->env_ipc_perm = 0;
 	}
 	e->env_ipc_recving = 0;
