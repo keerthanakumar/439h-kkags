@@ -74,12 +74,11 @@ trap_init(void)
 
 	// LAB 3: Your code here.
 	int i;
-	for (i = 0; i < 32; i++) {
+	for (i = 0; i < 48; i++) {
 		SETGATE(idt[i], 0, GD_KT, vector[i], 0);
 	}
 	SETGATE(idt[T_BRKPT], 0, GD_KT, vector[T_BRKPT], 3);
 	SETGATE(idt[T_SYSCALL], 0, GD_KT, vector[T_SYSCALL], 3);
-
 
 	// Per-CPU setup 
 	trap_init_percpu();

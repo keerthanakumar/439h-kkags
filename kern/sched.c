@@ -35,7 +35,7 @@ sched_yield(void)
 	for (i = 0; i < NENV; i++) {
 	       nexteid = (firsteid + i) % NENV;
 	       if (envs[nexteid].env_type != ENV_TYPE_IDLE && envs[nexteid].env_status == ENV_RUNNABLE) {
-			cprintf("scheduler: running environment id = %d\n", envs[nexteid].env_id);
+			//cprintf("scheduler: running environment id = %d\n", envs[nexteid].env_id);
 		       env_run(&envs[nexteid]);
 		       break;
 	       }

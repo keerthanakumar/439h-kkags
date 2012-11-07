@@ -133,7 +133,7 @@ fork(void)
 	//cprintf("\tsys_getenvid() = %d\n", sys_getenvid());
 	//cprintf("\tenvid_ch = %d\n", envid_ch);
 	if (envid_ch == 0) {
-		cprintf("envid_ch == 0\n");
+		//cprintf("envid_ch == 0\n");
 		thisenv = &envs[ENVX(sys_getenvid())];
 		return 0;
 	}
