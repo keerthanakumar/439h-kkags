@@ -4,7 +4,7 @@
 #include <kern/pmap.h>
 #include <kern/monitor.h>
 
-#define CUSTOM_SCHED 1
+#define CUSTOM_SCHED 0
 
 // Choose a user environment to run and run it.
 void
@@ -46,14 +46,16 @@ sched_yield(void)
 
 	}
 
-	//our fixed-priority scheduler (challenge problem)
+	//our dynamic-priority scheduler (challenge problem)
 	else {
 		static int numRuns = 0;
 		if (numRuns && curenv->env_type != ENV_TYPE_IDLE &&
 			curenv->env_status == ENV_RUNNING) {
 			numRuns--;
-			if (numRuns == 0)
-				curenv->env_priority--;
+			if (numRuns == 0) {
+				if (curenv->env_priority != LOW_PRI)
+					curenv->env_priority--;
+			}
 			env_run(curenv);
 		}
 
