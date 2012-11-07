@@ -131,6 +131,7 @@ env_init(void)
 		envs[i].env_runs = 0;
 		envs[i].env_link = env_free_list;
 		envs[i].env_pgdir = NULL;
+		envs[i].env_priority = 1;
 		env_free_list = &envs[i];
 	}
 
@@ -216,6 +217,14 @@ env_setup_vm(struct Env *e)
 	return 0;
 }
 
+// A wrapper function for alloc that takes an extra parameterw which
+// helps processes to gain CPU usage priority for the priority scheduling 
+// algorithm.
+int
+env_alloc(struct Env **newenv_store, envid_t parent_id) {
+	return env_alloc_p(newenv_store, parent_id, 1);
+}
+
 //
 // Allocates and initializes a new environment.
 // On success, the new environment is stored in *newenv_store.
@@ -225,7 +234,7 @@ env_setup_vm(struct Env *e)
 //	-E_NO_MEM on memory exhaustion
 //
 int
-env_alloc(struct Env **newenv_store, envid_t parent_id)
+env_alloc_p(struct Env **newenv_store, envid_t parent_id, int envpriority)
 {
 	int32_t generation;
 	int r;
@@ -250,6 +259,8 @@ env_alloc(struct Env **newenv_store, envid_t parent_id)
 	e->env_type = ENV_TYPE_USER;
 	e->env_status = ENV_RUNNABLE;
 	e->env_runs = 0;
+	// Adding the priority for the env
+	e->env_priority = envpriority;
 
 	// Clear out all the saved register state,
 	// to prevent the register values
@@ -288,6 +299,7 @@ env_alloc(struct Env **newenv_store, envid_t parent_id)
 	cprintf("[%08x] new env %08x\n", curenv ? curenv->env_id : 0, e->env_id);
 	return 0;
 }
+
 
 //
 // Allocate len bytes of physical memory for environment env,

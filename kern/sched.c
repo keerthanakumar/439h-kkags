@@ -4,11 +4,13 @@
 #include <kern/pmap.h>
 #include <kern/monitor.h>
 
+#define CUSTOM_SCHED 0
 
 // Choose a user environment to run and run it.
 void
 sched_yield(void)
 {
+	if (!CUSTOM_SCHED) {
 	struct Env *idle;
 	int i;
 	// Implement simple round-robin scheduling.
@@ -96,4 +98,5 @@ for (i = 0; i < NENV; i++) {
 	if (!(idle->env_status == ENV_RUNNABLE || idle->env_status == ENV_RUNNING))
 		panic("CPU %d: No idle environment!", cpunum());
 	env_run(idle);
+	}
 }
