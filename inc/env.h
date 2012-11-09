@@ -45,6 +45,13 @@ enum EnvType {
 	ENV_TYPE_FS,		// File system server
 };
 
+//Challenge Problem Enum
+enum EnvPriority {
+	LOW_PRI = 0,
+	MED_PRI,
+	HI_PRI,
+};
+
 struct Env {
 	struct Trapframe env_tf;	// Saved registers
 	struct Env *env_link;		// Next free Env
@@ -67,6 +74,9 @@ struct Env {
 	uint32_t env_ipc_value;		// Data value sent to us
 	envid_t env_ipc_from;		// envid of the sender
 	int env_ipc_perm;		// Perm of page mapping received
+	
+	//ENV priority
+	enum EnvPriority env_priority;		//Fixed priority scheduler for Envs
 };
 
 #endif // !JOS_INC_ENV_H

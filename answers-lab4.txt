@@ -1,0 +1,15 @@
+Keerthana Kumar
+kk8
+Andrew Sharp
+ags799
+
+Lab 4
+
+1. The macro MPBOOTPHYS calculates the load address for an application. This address needs to be unique for every application that is initiated in the operating system. boot.S does not have this macro because the kernel is always loaded into the same address in memory (0x7c00). If the macro was not defined in mpentry.S and not implemented in the code directly, every application would be loaded to the same location in memory.
+
+2. Assume all CPUs have the same stack. A TRAP_HANDLER is called on one of the CPUs. The kernel is locked, and the trap is carried out by the appropriate CPU. Meanwhile, the other CPUs continue to run user processes. If the kernel must be invoked during the operation of these processes, there must be a stack to push a Trapframe to. The kernel code will not be invoked but a Trapframe will be pushed and the user code will be temporarily halted. Without a separate kernel stack per CPU (in other words, per running process), there will not be room enough for these processes to operate with kernel support.
+
+3. We pass lcr3 the page directory pertaining to e. However, the e's fields are accessed via kern_pgdir. It is independent of which environment's pgdir has been loaded into lcr3.
+
+CHALLENGE:
+We implemented a dynamic priority scheduler. All processes are started with a high priority. Each time they are run, their priority is decremented, until they reach lowest priority. Higher priority processes are run for longer periods of time. Our implementation includes an addition of env_priority to struct Env, an env_alloc wrapper, and an alternative scheduler (you can turn it on and off with the #define CUSTOM_SCHEDULER at the top of kern/sched.c). Our test program is user/testPriority.c. Unfortunately, we were not able to run the test program.
