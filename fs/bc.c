@@ -58,7 +58,6 @@ bc_pgfault(struct UTrapframe *utf)
 		panic("bc_pgfault: unable to ide_read");
 	if (sys_page_map(envid, block_addr, envid, block_addr, PTE_SYSCALL) < 0) //it should already be PTE_SYSCALL & PTE_D, we need to get rid of the PTE_D part
 		panic("bc_pgfault: unable to page map");
-	panic("bc_pgfault not implemented");
 
 	// Check that the block we read was allocated. (exercise for
 	// the reader: why do we do this *after* reading the block
@@ -83,7 +82,15 @@ flush_block(void *addr)
 		panic("flush_block of bad va %08x", addr);
 
 	// LAB 5: Your code here.
-	
+	if (!va_is_mapped(addr) || !va_is_dirty(addr)) {
+		return;
+	}
+	void* block_addr = ROUNDDOWN(addr, PGSIZE);
+	envid_t envid = thisenv->env_id;
+	if (ide_write(blockno*BLKSECTS, block_addr, BLKSECTS) < 0)
+		panic("flush_block: unable to ide_write");
+	if (sys_page_map(envid, block_addr, envid, block_addr, PTE_SYSCALL) < 0)
+		panic("flush_block: unable to sys_page_map");
 }
 
 // Test that the block cache works, by smashing the superblock and
