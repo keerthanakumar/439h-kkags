@@ -49,6 +49,15 @@ bc_pgfault(struct UTrapframe *utf)
 	// the page dirty).
 	//
 	// LAB 5: Your code here
+	envid_t envid;
+	envid = thisenv->env_id;
+	void* block_addr = ROUNDDOWN(addr, PGSIZE);
+	if (sys_page_alloc(envid, block_addr, PTE_SYSCALL) < 0)
+		panic("bc_pgfault: unable to allocate a disk block");
+	if (ide_read(blockno*BLKSECTS, block_addr, BLKSECTS) < 0)
+		panic("bc_pgfault: unable to ide_read");
+	if (sys_page_map(envid, block_addr, envid, block_addr, PTE_SYSCALL) < 0) //it should already be PTE_SYSCALL & PTE_D, we need to get rid of the PTE_D part
+		panic("bc_pgfault: unable to page map");
 	panic("bc_pgfault not implemented");
 
 	// Check that the block we read was allocated. (exercise for
@@ -74,7 +83,7 @@ flush_block(void *addr)
 		panic("flush_block of bad va %08x", addr);
 
 	// LAB 5: Your code here.
-	panic("flush_block not implemented");
+	
 }
 
 // Test that the block cache works, by smashing the superblock and
