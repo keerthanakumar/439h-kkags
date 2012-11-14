@@ -124,6 +124,8 @@ int     nsipc_send(int s, const void *buf, int size, unsigned int flags);
 int     nsipc_socket(int domain, int type, int protocol);
 
 // spawn.c
+envid_t	exec(const char *program, const char **argv);
+envid_t	execl(const char *program, const char *arg0, ...);
 envid_t	spawn(const char *program, const char **argv);
 envid_t	spawnl(const char *program, const char *arg0, ...);
 
