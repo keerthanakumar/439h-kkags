@@ -91,7 +91,7 @@ envid2env(envid_t envid, struct Env **env_store, bool checkperm)
 	e = &envs[ENVX(envid)];
 	if (e->env_status == ENV_FREE || e->env_id != envid) {
 		cprintf("envid2env: env status is free or wrong envid\n");
-		cprintf("\tenv status = %d, e->env_id = %d, envid = %d\n", e->env_status, e->env_id, envid);
+		cprintf("\tenv status = %d, e->env_id = %x, envid = %x\n", e->env_status, e->env_id, envid);
 		*env_store = 0;
 		return -E_BAD_ENV;
 	}
@@ -386,7 +386,6 @@ load_icode(struct Env *e, uint8_t *binary, size_t size)
 	//  What?  (See env_run() and env_pop_tf() below.)
 
 	// LAB 3: Your code here.
-
 	struct Elf* elf = (struct Elf*)binary;
 	struct Proghdr *ph, *eph;
 	struct Secthdr* sh;

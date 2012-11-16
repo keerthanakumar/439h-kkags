@@ -78,6 +78,8 @@ ide_read(uint32_t secno, void *dst, size_t nsecs)
 	for (; nsecs > 0; nsecs--, dst += SECTSIZE) {
 		if ((r = ide_wait_ready(1)) < 0)
 			return r;
+		cprintf("fs/ide.c:ide_read: calling insl...\n");
+		cprintf("\tdst = %p\n", dst);
 		insl(0x1F0, dst, SECTSIZE/4);
 	}
 

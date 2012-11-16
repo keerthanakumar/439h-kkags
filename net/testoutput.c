@@ -14,8 +14,10 @@ umain(int argc, char **argv)
 {
 	envid_t ns_envid = sys_getenvid();
 	int i, r;
+	//cprintf("\n\nns_envid = %x\n\n", ns_envid);
 
 	binaryname = "testoutput";
+	//cprintf("\n\nlol\n\n");
 
 	output_envid = fork();
 	if (output_envid < 0)

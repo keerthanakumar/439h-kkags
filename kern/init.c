@@ -64,8 +64,9 @@ i386_init(void)
 
 	// Should always have idle processes at first.
 	int i;
-	for (i = 0; i < NCPU; i++)
+	for (i = 0; i < NCPU; i++) {
 		ENV_CREATE(user_idle, ENV_TYPE_IDLE);
+	}
 
 	// Start fs.
 	ENV_CREATE(fs_fs, ENV_TYPE_FS);
@@ -80,10 +81,11 @@ i386_init(void)
 	ENV_CREATE(TEST, ENV_TYPE_USER);
 #else
 	// Touch all you want.
-	// ENV_CREATE(net_testoutput, ENV_TYPE_USER);
-	// ENV_CREATE(user_echosrv, ENV_TYPE_USER);
-	// ENV_CREATE(user_httpd, ENV_TYPE_USER);
-	//ENV_CREATE(user_yield, ENV_TYPE_USER);
+//cprintf("\ntestoutput env creating...\n");
+//	ENV_CREATE(net_testoutput, ENV_TYPE_USER);
+//	ENV_CREATE(user_echosrv, ENV_TYPE_USER);
+//	ENV_CREATE(user_httpd, ENV_TYPE_USER);
+//	ENV_CREATE(user_yield, ENV_TYPE_USER);
 #endif // TEST*
 
 	// Schedule and run the first user environment!

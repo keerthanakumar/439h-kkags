@@ -5,6 +5,7 @@
 #include <kern/pcireg.h>
 #include <kern/e1000.h>
 
+
 // Flag to do "lspci" at bootup
 static int pci_show_devs = 1;
 static int pci_show_addrs = 0;
@@ -30,6 +31,7 @@ struct pci_driver pci_attach_class[] = {
 
 // pci_attach_vendor matches the vendor ID and device ID of a PCI device
 struct pci_driver pci_attach_vendor[] = {
+	{ E1000_VENDORID, E1000_DEVICEID, &e1000_attach},
 	{ 0, 0, 0 },
 };
 
@@ -176,7 +178,7 @@ pci_bridge_attach(struct pci_func *pcif)
 	nbus.busno = (busreg >> PCI_BRIDGE_BUS_SECONDARY_SHIFT) & 0xff;
 
 	if (pci_show_devs)
-		cprintf("PCI: %02x:%02x.%d: bridge to PCI bus %d--%d\n",
+		cprintf("PCI: %04x:%02x.%d: bridge to PCI bus %d--%d\n",
 			pcif->bus->busno, pcif->dev, pcif->func,
 			nbus.busno,
 			(busreg >> PCI_BRIDGE_BUS_SUBORDINATE_SHIFT) & 0xff);

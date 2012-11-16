@@ -102,6 +102,7 @@ check_bc(void)
 
 	// back up super block
 	memmove(&backup, diskaddr(1), sizeof backup);
+	cprintf("check_bc: backup lucky charms = %p\n", backup.s_magic);
 
 	// smash it
 	strcpy(diskaddr(1), "OOPS!\n");
