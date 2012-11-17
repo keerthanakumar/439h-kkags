@@ -92,6 +92,7 @@ envid2env(envid_t envid, struct Env **env_store, bool checkperm)
 	if (e->env_status == ENV_FREE || e->env_id != envid) {
 		cprintf("envid2env: env status is free or wrong envid\n");
 		cprintf("\tenv status = %d, e->env_id = %x, envid = %x\n", e->env_status, e->env_id, envid);
+		cprintf("\tenv_status location %p\n", &e->env_status);
 		*env_store = 0;
 		return -E_BAD_ENV;
 	}
@@ -507,7 +508,6 @@ env_destroy(struct Env *e)
 		e->env_status = ENV_DYING;
 		return;
 	}
-
 	env_free(e);
 
 	if (curenv == e) {

@@ -12,6 +12,7 @@
 #include <kern/console.h>
 #include <kern/sched.h>
 #include <kern/time.h>
+#include <kern/e1000.h>
 
 // Print a string to the system console.
 // The string is exactly 'len' characters long.
@@ -66,7 +67,6 @@ sys_env_destroy(envid_t envid) //Don't forget to modify syscall() to dispatch sy
 static void
 sys_yield(void)
 {
-	//cprintf("sys_yield called\n");
 	sched_yield();
 }
 
@@ -431,7 +431,6 @@ static int
 sys_ipc_recv(void *dstva)
 {
 	// LAB 4: Your code here.
-	//cprintf("sys_ipc_recv, start: dstva = %p\n", dstva);
 	//cprintf("RECV thisenv = %x\n", curenv->env_id);
 	//panic("");
 	if(((uint32_t) dstva < UTOP) && ((uint32_t) dstva % PGSIZE != 0)){
@@ -440,13 +439,10 @@ sys_ipc_recv(void *dstva)
 	}
 	curenv->env_ipc_dstva = dstva;
 	curenv->env_ipc_recving = 1;
-	//cprintf("curenvid = %x\n", curenv->env_id);
 	//panic("");
 	curenv->env_status = ENV_NOT_RUNNABLE;
-	//cprintf("recv: sysyield\n");
 	curenv->env_tf.tf_regs.reg_eax = 0;
 	sys_yield();
-	//cprintf("sys_ipc_recv, progress\n");
 	
 
 	return 0;
@@ -461,6 +457,14 @@ sys_time_msec(void)
 {
 	// LAB 6: Your code here.
         return time_msec();
+}
+
+static int
+sys_net_send(char* data, int len) {
+	if ((uintptr_t)data >= UTOP) {
+		return -E_INVAL;
+	}
+	return e1000_transmit(data, len);
 }
 
 // Dispatches to the correct kernel function, passing the arguments.
@@ -520,6 +524,9 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
                 case SYS_time_msec:
                         return_value = sys_time_msec();
                         break;
+		case SYS_net_send:
+			return_value = sys_net_send((char *)a1, (int)a2);
+			break;
 		default:
 			return_value = -E_INVAL;
 	}

@@ -48,7 +48,9 @@ ipc_recv(envid_t *from_env_store, void *pg, int *perm_store)
 	if(!pg){
 		pg = (void *) UTOP;
 	}
+
 	value = sys_ipc_recv(pg);
+	cprintf("\t ipc_rec called and progress\n");
 	if(value < 0){
 		sender = 0;
 		perm = 0;
@@ -58,6 +60,7 @@ ipc_recv(envid_t *from_env_store, void *pg, int *perm_store)
 		perm = thisenv->env_ipc_perm;
 		value = thisenv->env_ipc_value;
 	}
+
 	if(from_env_store){
 		*from_env_store = sender;
 	}

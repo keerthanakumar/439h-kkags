@@ -350,6 +350,7 @@ serve(void)
 			cprintf("fs req %d from %08x [page %08x: %s]\n",
 				req, whom, vpt[PGNUM(fsreq)], fsreq);
 
+
 		// All requests must contain an argument page
 		if (!(perm & PTE_P)) {
 			cprintf("Invalid request from %08x: no argument page\n",
@@ -367,6 +368,7 @@ serve(void)
 			r = -E_INVAL;
 		}
 		ipc_send(whom, r, pg, perm);
+		
 		sys_page_unmap(0, fsreq);
 	}
 }

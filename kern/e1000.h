@@ -18,7 +18,10 @@
 
 #define E1000_TX_DESC		64
 #define TX_PKT_SIZE		1518
+
 #define E1000_TXD_STATUS_DD	0X1
+#define E1000_TXD_CMD_RS	0X8
+#define E1000_TXD_CMD_EOP	0X1
 
 #define E1000_TCTL     0x00400  /* TX Control - RW */
 #define E1000_TCTL_EN     0x00000002    /* enable tx */
@@ -29,6 +32,7 @@
 
 volatile uint32_t* e1000;
 int e1000_attach(struct pci_func *pcifunc);
+int e1000_transmit (char *data, int len);
 
 struct tx_desc
 {

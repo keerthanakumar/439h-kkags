@@ -260,6 +260,7 @@ trap(struct Trapframe *tf)
 
 		// Garbage collect if current enviroment is a zombie
 		if (curenv->env_status == ENV_DYING) {
+			cprintf("\n\t\t\ttrap.c: CURENV %d\n", curenv->env_id);			
 			env_free(curenv);
 			curenv = NULL;
 			sched_yield();
@@ -285,9 +286,12 @@ trap(struct Trapframe *tf)
 	// scheduled, so we should return to the current environment
 	// if doing so makes sense.
 	if (curenv && curenv->env_status == ENV_RUNNING)
+	{
 		env_run(curenv);
-	else
+	}
+	else{
 		sched_yield();
+	}
 }
 
 

@@ -33,21 +33,23 @@ sched_yield(void)
 	uint32_t envid = curenv ? ENVX(curenv->env_id) : 0;
 	uint32_t firsteid = (++envid) % NENV;
 	uint32_t nexteid;
-
+	int foundAGoodOne = 0;
 	for (i = 0; i < NENV; i++) {
 	       nexteid = (firsteid + i) % NENV;
 	       if (envs[nexteid].env_type != ENV_TYPE_IDLE && envs[nexteid].env_status == ENV_RUNNABLE) {
 		       env_run(&envs[nexteid]);
+			foundAGoodOne = 1;
+			break;
 	       }
 	}
-	if (curenv && curenv->env_type != ENV_TYPE_IDLE && curenv->env_status == ENV_RUNNING){
+	if (curenv && curenv->env_type != ENV_TYPE_IDLE && curenv->env_status == ENV_RUNNING && !foundAGoodOne){
 			env_run(curenv);
 	}
 
 	}
 
 	//our dynamic-priority scheduler (challenge problem)
-	else {
+	/*else {
 		static int numRuns = 0;
 		if (numRuns && curenv->env_type != ENV_TYPE_IDLE &&
 			curenv->env_status == ENV_RUNNING) {
@@ -71,7 +73,7 @@ sched_yield(void)
 			       env_run(&envs[nexteid]);
 		       }
 		}
-	}
+	}*/
 
 	// For debugging and testing purposes, if there are no
 	// runnable environments other than the idle environments,
@@ -93,5 +95,6 @@ sched_yield(void)
 	idle = &envs[cpunum()];
 	if (!(idle->env_status == ENV_RUNNABLE || idle->env_status == ENV_RUNNING))
 		panic("CPU %d: No idle environment!", cpunum());
+	//cprintf("Going to run idle\n");
 	env_run(idle);
 }
