@@ -79,6 +79,7 @@ bufDump(const char* prefix, void* data, int len) {
 
 int 
 e1000_transmit (char *data, int len) {
+	//bad - need to split these up
 	if (len > TX_PKT_SIZE){
 		cprintf("\tERROR: kern/e1000.c:e1000_transmit: the packet is too long\n");
 		return -E_PKT_TOO_LONG;
@@ -92,6 +93,7 @@ e1000_transmit (char *data, int len) {
 		cprintf("\tLen = %x\n", len);
 		int i;
 		for (i = 0; i < len; i++) {
+			cprintf("data[%d] = %c\n", i, data[i]);
 			tx_pkt_bufs[tdt].buf[i] = data[i];
 		}
 		//memmove(tx_pkt_bufs[tdt].buf, data, len);
@@ -106,6 +108,7 @@ e1000_transmit (char *data, int len) {
 		cprintf("\tTCTL = %p\n", e1000[E1000_TCTL]);
 		tx_bufs[tdt].cmd |= E1000_TXD_CMD_RS;
 		cprintf("\tTCTL = %p\n", e1000[E1000_TCTL]);
+		//EOP is only for the last one of packet
 		tx_bufs[tdt].cmd |= E1000_TXD_CMD_EOP;
 		cprintf("tdt before increment: %d\n", e1000[E1000_TDT]);
 		e1000[E1000_TDT] = (tdt + 1) % E1000_TX_DESC;
