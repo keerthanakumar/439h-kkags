@@ -1,5 +1,6 @@
 #include <kern/time.h>
 #include <inc/assert.h>
+#include <kern/e1000.h>
 
 static unsigned int ticks;
 

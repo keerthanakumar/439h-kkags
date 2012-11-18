@@ -9,7 +9,7 @@
 
 #define E1000_STATUS 0x00008/4
 
-//we divided all these by 4 and Kk does know why
+//we divided all these by 4
 #define E1000_TDBAL    0x03800/4  /* TX Descriptor Base Address Low - RW */
 #define E1000_TDBAH    0x03804/4  /* TX Descriptor Base Address High - RW */
 #define E1000_TDLEN    0x03808/4  /* TX Descriptor Length - RW */

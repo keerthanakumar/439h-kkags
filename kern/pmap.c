@@ -10,6 +10,7 @@
 #include <kern/kclock.h>
 #include <kern/env.h>
 #include <kern/cpu.h>
+#include <kern/e1000.h>
 
 #define DEBUG 1
 

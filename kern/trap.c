@@ -14,6 +14,7 @@
 #include <kern/cpu.h>
 #include <kern/spinlock.h>
 #include <kern/time.h>
+#include <kern/e1000.h>
 
 static struct Taskstate ts;
 

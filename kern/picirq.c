@@ -4,6 +4,7 @@
 #include <inc/trap.h>
 
 #include <kern/picirq.h>
+#include <kern/e1000.h>
 
 
 // Current IRQ mask.

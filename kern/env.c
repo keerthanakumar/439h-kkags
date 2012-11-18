@@ -14,6 +14,7 @@
 #include <kern/sched.h>
 #include <kern/cpu.h>
 #include <kern/spinlock.h>
+#include <kern/e1000.h>
 
 struct Env *envs = NULL;		// All environments
 static struct Env *env_free_list;	// Free environment list

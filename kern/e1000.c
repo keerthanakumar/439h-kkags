@@ -10,7 +10,6 @@ struct tx_pkt tx_pkt_bufs[E1000_TX_DESC];
 
 int
 e1000_attach(struct pci_func *pcifunc) {
-	cprintf("kern/e1000.c:e1000_attach: entered\n");
 	pci_func_enable(pcifunc);
 	e1000 = (void*)mmio_map_region(pcifunc->reg_base[0], pcifunc->reg_size[0]);
 //	boot_map_region(kern_pgdir, E1000_MMIO_ADDR,
@@ -19,10 +18,10 @@ e1000_attach(struct pci_func *pcifunc) {
 //	e1000 = (void*)E1000_MMIO_ADDR;
 	assert(e1000[E1000_STATUS] == 0X80080783);
 
-	memset(tx_bufs, 0,
-		sizeof(struct tx_desc) * E1000_TX_DESC);
-	memset(tx_pkt_bufs, 0,
-		sizeof(struct tx_pkt) * E1000_TX_DESC);
+//	memset(tx_bufs, 0,
+//		sizeof(struct tx_desc) * E1000_TX_DESC);
+//	memset(tx_pkt_bufs, 0,
+//		sizeof(struct tx_pkt) * E1000_TX_DESC);
 	int i;
 	for (i = 0; i < E1000_TX_DESC; i++) {
 		tx_bufs[i].addr = PADDR(tx_pkt_bufs[i].buf);
@@ -33,30 +32,32 @@ e1000_attach(struct pci_func *pcifunc) {
 	e1000[E1000_TDBAH] = 0;
 
 	//initializing transmit descriptor length
-	e1000[E1000_TDLEN] = sizeof(struct tx_desc) * E1000_TX_DESC;
+	e1000[E1000_TDLEN] = sizeof(tx_bufs);//sizeof(struct tx_desc) * E1000_TX_DESC;
 
 	//now for head & tail
 	e1000[E1000_TDH] = 0;
 	e1000[E1000_TDT] = 0;
 
 	//now for control registers
-	e1000[E1000_TCTL] |= E1000_TCTL_EN;
 	e1000[E1000_TCTL] |= E1000_TCTL_PSP;
 	e1000[E1000_TCTL] &= ~E1000_TCTL_CT;
 	e1000[E1000_TCTL] |= 0x10 << 4;
 	e1000[E1000_TCTL] &= ~E1000_TCTL_COLD;
 	e1000[E1000_TCTL] |= 0x40 << 12;
+	cprintf("TCTL before enable set = %p\n", e1000[E1000_TCTL]);
+	e1000[E1000_TCTL] |= E1000_TCTL_EN;
+	cprintf("TCTL after init = %p\n", e1000[E1000_TCTL]);
 
 	//register bit descriptors, part deux
-	e1000[E1000_TIPG] = (7<<20)|(8<<10)|(8<<0);
+	e1000[E1000_TIPG] = 0x702008;
+//(7<<20)|(8<<10)|(8<<0);
 
 	return 0;
 }
 
-
 void 
 bufDump(const char* prefix, void* data, int len) {
-	cprintf("\tkern/e1000.c:bufDump: entered\n");
+	cprintf("\t\tEntered Buff with data = %p, len = %d\n", data, len);
 	char buf[80];
 	char* end = buf + sizeof(buf);
 	char *out = NULL;
@@ -66,9 +67,9 @@ bufDump(const char* prefix, void* data, int len) {
 			out = buf + snprintf(buf, end-buf, "%s%04x ", prefix, i);
 
 		out += snprintf(out, end - out, "%02x", ((uint8_t*) data)[i]);
-			
-		if (i % 16 == 15 || i == len - 1)
-			cprintf("%.*s\n", out - buf, buf);
+
+		if (i % 16 == 15 || i == len - 1);
+			//cprintf("%.*s\n", out - buf, buf);
 		if (i % 2 == 1)
 			*(out++) = ' ';
 		if (i % 16 == 7)
@@ -78,30 +79,43 @@ bufDump(const char* prefix, void* data, int len) {
 
 int 
 e1000_transmit (char *data, int len) {
-	cprintf("kern/e1000.c:e1000_transmit: entered\n");
 	if (len > TX_PKT_SIZE){
 		cprintf("\tERROR: kern/e1000.c:e1000_transmit: the packet is too long\n");
 		return -E_PKT_TOO_LONG;
 	}
 	
+	cprintf("Entered e1000_transmit\n");
 	uint32_t tdt = e1000[E1000_TDT];
-	
+	cprintf("\ttdt = %x, E1000_TDT = %x\n", tdt, E1000_TDT);
 	if (tx_bufs[tdt].status & E1000_TXD_STATUS_DD) {
-		cprintf("\tkern/e1000.c:e1000_transmit: packet status passes\n");
-		memmove(tx_pkt_bufs[tdt].buf, data, len);
+		cprintf("\tData = %s\n", data);
+		cprintf("\tLen = %x\n", len);
+		int i;
+		for (i = 0; i < len; i++) {
+			tx_pkt_bufs[tdt].buf[i] = data[i];
+		}
+		//memmove(tx_pkt_bufs[tdt].buf, data, len);
 		tx_bufs[tdt].length = len;
+		cprintf("\ttx_pkt_buf[tdt].buf = %s\n", tx_pkt_bufs[tdt].buf);
 
 		//We need to actually dump the data
-		bufDump("buf_prefix:", data, len);
+		//bufDump("e1000:", data, len);
+		cprintf("\ttxt_bufs[tdt].status before = %x\n", tx_bufs[tdt].status);
 		tx_bufs[tdt].status &= ~E1000_TXD_STATUS_DD;
+		cprintf("\ttxt_bufs[tdt].status after = %x\n", tx_bufs[tdt].status);
+		cprintf("\tTCTL = %p\n", e1000[E1000_TCTL]);
 		tx_bufs[tdt].cmd |= E1000_TXD_CMD_RS;
+		cprintf("\tTCTL = %p\n", e1000[E1000_TCTL]);
 		tx_bufs[tdt].cmd |= E1000_TXD_CMD_EOP;
+		cprintf("tdt before increment: %d\n", e1000[E1000_TDT]);
 		e1000[E1000_TDT] = (tdt + 1) % E1000_TX_DESC;
+		cprintf("tdt after increment: %d\n", e1000[E1000_TDT]);
+		cprintf("\tTCTL = %p\n", e1000[E1000_TCTL]);
+		cprintf("\te1000[E1000_TDT] = %x\n", e1000[E1000_TDT]);
+		cprintf("\ttx_buf[tdt].addr = %p, cmd = %p, CSO = %p, len = %p, special = %p, CSS = %p, status = %p\n", tx_bufs[tdt].addr, tx_bufs[tdt].cmd, tx_bufs[tdt].cso, tx_bufs[tdt].length, tx_bufs[tdt].special, tx_bufs[tdt].css, tx_bufs[tdt].status);
 	}
 	else {
-		cprintf("\tERROR: kern/e1000.c:e1000_transmit: this state ain't big enough for the two of us\n");
 		return -E_TX_FULL;
 	}
-	cprintf("\tkern/e1000.c:e1000_transmit: returning\n");
 	return 0;
 }

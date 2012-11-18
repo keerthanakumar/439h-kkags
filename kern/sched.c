@@ -3,6 +3,7 @@
 #include <kern/env.h>
 #include <kern/pmap.h>
 #include <kern/monitor.h>
+#include <kern/e1000.h>
 
 #define CUSTOM_SCHED 0
 
