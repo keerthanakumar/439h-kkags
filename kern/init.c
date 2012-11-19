@@ -93,7 +93,7 @@ i386_init(void)
 	char* data = "lol";
 	int lala = 0;
 	for(lala = 0; lala < 1000; lala++){
-		data = data + "lol";
+		data = strcat(data, "lol");
 	}
 	int len = 3;
 	e1000_transmit(data, len);
