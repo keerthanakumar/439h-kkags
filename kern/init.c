@@ -93,6 +93,7 @@ i386_init(void)
 	char* data = "olo";
 	int len = 3;
 	e1000_transmit(data, len);
+	e1000_transmit((char*)"lol", len);
 	sched_yield();
 }
 

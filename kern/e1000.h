@@ -5,7 +5,6 @@
 
 #define E1000_VENDORID	0x8086
 #define E1000_DEVICEID	0x100e
-#define E1000_MMIO_ADDR	KSTACKTOP
 
 #define E1000_STATUS 0x00008/4
 
@@ -23,12 +22,12 @@
 #define E1000_TXD_CMD_RS	0X8
 #define E1000_TXD_CMD_EOP	0X1
 
-#define E1000_TCTL     0x00400  /* TX Control - RW */
+#define E1000_TCTL     0x00400/4  /* TX Control - RW */
 #define E1000_TCTL_EN     0x00000002    /* enable tx */
 #define E1000_TCTL_PSP    0x00000008    /* pad short packets */
 #define E1000_TCTL_CT     0x00000ff0    /* collision threshold */
 #define E1000_TCTL_COLD   0x003ff000    /* collision distance */
-#define E1000_TIPG     0x00410  /* TX Inter-packet gap -RW */
+#define E1000_TIPG     0x00410/4  /* TX Inter-packet gap -RW */
 
 volatile uint32_t* e1000;
 int e1000_attach(struct pci_func *pcifunc);
