@@ -467,6 +467,16 @@ sys_net_send(char* data, int len) {
 	return e1000_transmit(data, len);
 }
 
+//static int 
+//sys_net_receive(char* data, int* len){
+	//if((uintptr_t) data >=UTOP)
+		//return -E_INVAL;
+	//*len = e1000_receive(data);
+	//if(*len > 0)
+		//return 0;
+	//return *len;
+//}
+
 // Dispatches to the correct kernel function, passing the arguments.
 int32_t
 syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, uint32_t a5)
@@ -527,6 +537,9 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 		case SYS_net_send:
 			return_value = sys_net_send((char *)a1, (int)a2);
 			break;
+		//case SYS_net_receive:
+			//return_value = sys_net_receive((char *) a1, (int *) a2);
+			//break;
 		default:
 			return_value = -E_INVAL;
 	}

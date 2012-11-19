@@ -59,28 +59,29 @@ int
 e1000_transmit (char *data, int len) {
 	int numBufs = len % TX_PKT_SIZE == 0 ? len / TX_PKT_SIZE : len / TX_PKT_SIZE + 1;
 	int tdt = e1000[E1000_TDT];
+	cprintf("e1000_transmit: len = %d, numBufs = %d, tdt = %d\n", len, numBufs, tdt);
 
-	int j;
-	int i = 0;
-	for (j = 0; j < numBufs; j++) {
+	int bufNum;
+	int totalBytes = 0;
+	for (bufNum = 0; bufNum < numBufs; bufNum++) {
 		tdt = e1000[E1000_TDT];
-		if (tx_bufs[tdt].status != E1000_TXD_STATUS_DD) {
-			return -E_TX_FULL;
+		cprintf("  bufNum = %d/%d, tdt = %d\n", bufNum, numBufs, tdt);
+
+		int byteNum;
+		for (byteNum = 0; byteNum < TX_PKT_SIZE; byteNum++) {
+			cprintf("    byteNum = %d/1518, totalBytes = %d/%d\n", byteNum, totalBytes, len);
+			tx_pkt_bufs[tdt].buf[byteNum] = data[totalBytes];
+			cprintf("      wrote a %c to bufNum %d of tdt %d\n", tx_pkt_bufs[tdt].buf[byteNum], bufNum, tdt);
+			totalBytes++;
+			if (totalBytes >= len) break;
 		}
-		int k = 0;
-		for (; i < len; k++,i++) {
-			if(k < TX_PKT_SIZE){		
-				tx_pkt_bufs[tdt].buf[k] = data[i];
-			}
-			else
-				break;
-		}
-		tx_bufs[tdt].length = len;
+		tx_bufs[tdt].length = len - (bufNum * TX_PKT_SIZE);
 		tx_bufs[tdt].cmd |= E1000_TXD_CMD_RS;
 		tx_bufs[tdt].status &= ~E1000_TXD_STATUS_DD;
+		if (bufNum == numBufs - 1)
+			tx_bufs[tdt].cmd |= E1000_TXD_CMD_EOP;
 		e1000[E1000_TDT] = (tdt + 1) % E1000_TX_DESC;
-	}	
-	tx_bufs[tdt].cmd |= E1000_TXD_CMD_EOP;
-	
+	}
+
 	return 0;
 }
