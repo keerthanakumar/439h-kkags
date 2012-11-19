@@ -59,19 +59,15 @@ int
 e1000_transmit (char *data, int len) {
 	int numBufs = len % TX_PKT_SIZE == 0 ? len / TX_PKT_SIZE : len / TX_PKT_SIZE + 1;
 	int tdt = e1000[E1000_TDT];
-	cprintf("e1000_transmit: len = %d, numBufs = %d, tdt = %d\n", len, numBufs, tdt);
 
 	int bufNum;
 	int totalBytes = 0;
 	for (bufNum = 0; bufNum < numBufs; bufNum++) {
 		tdt = e1000[E1000_TDT];
-		cprintf("  bufNum = %d/%d, tdt = %d\n", bufNum, numBufs, tdt);
 
 		int byteNum;
 		for (byteNum = 0; byteNum < TX_PKT_SIZE; byteNum++) {
-			cprintf("    byteNum = %d/1518, totalBytes = %d/%d\n", byteNum, totalBytes, len);
 			tx_pkt_bufs[tdt].buf[byteNum] = data[totalBytes];
-			cprintf("      wrote a %c to bufNum %d of tdt %d\n", tx_pkt_bufs[tdt].buf[byteNum], bufNum, tdt);
 			totalBytes++;
 			if (totalBytes >= len) break;
 		}
