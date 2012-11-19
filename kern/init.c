@@ -90,14 +90,7 @@ i386_init(void)
 #endif // TEST*
 
 	// Schedule and run the first user environment!
-	char* data = "lol";
-	int lala = 0;
-	for(lala = 0; lala < 1000; lala++){
-		data = strcat(data, "lol");
-	}
-	int len = 3;
-	e1000_transmit(data, len);
-	e1000_transmit((char*)"lol", len);
+	e1000_transmit("lol", 3);
 	sched_yield();
 }
 
