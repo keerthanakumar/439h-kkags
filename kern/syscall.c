@@ -403,6 +403,8 @@ sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
 	}
 	else {
 		//cprintf("\tenv doesn't want a page\n");
+	//memcpy(data,rx_pkt_bufs[rdt].buf, len);
+	//memcpy(data,rx_pkt_bufs[rdt].buf, len);
 		e->env_ipc_perm = 0;
 	}
 	e->env_ipc_recving = 0;
@@ -468,12 +470,12 @@ sys_net_send(char* data, int len) {
 }
 
 static int 
-sys_net_receive(char* data, int* len){
+sys_net_receive(char* data){//, int* len){
 	if((uintptr_t) data >=UTOP)
 		return -E_INVAL;
 	int r;
-	r = e1000_receive(&data, len);
-	cprintf("kern/syscall.c, sys_net_receive(): data = %c, len = %d\n", *data, *len);
+	r = e1000_receive(data);//, len);
+	//cprintf("kern/syscall.c, sys_net_receive(): data = %c, len = %d\n", *data, *len);
 	return r;
 }
 
@@ -538,7 +540,7 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 			return_value = sys_net_send((char *)a1, (int)a2);
 			break;
 		case SYS_net_receive:
-			return_value = sys_net_receive((char *) a1, (int *) a2);
+			return_value = sys_net_receive((char *) a1);
 			break;
 		default:
 			return_value = -E_INVAL;

@@ -129,6 +129,6 @@ sys_net_send(char* data, int len) {
 }
 
 int
-sys_net_receive(char* data, int* len) {
-	return syscall(SYS_net_receive, 0, (uint32_t)data, (uint32_t)len, 0, 0, 0); //iwejfsivhj - perhaps should be casted as int?
+sys_net_receive(char* data) {
+	return syscall(SYS_net_receive, 0, (uint32_t)data, 0, 0, 0, 0); //iwejfsivhj - perhaps should be casted as int?
 }

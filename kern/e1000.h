@@ -26,7 +26,7 @@
 #define E1000_TX_DESC           64
 
 #define E1000_RX_DESC		64
-#define RX_PKT_SIZE		1518 //i'm not sure
+#define RX_PKT_SIZE		2048
 
 #define E1000_RXD_STATUS_DD	0x1
 #define E1000_RXD_STAT_EOP      0x02    /* End of Packet */
@@ -46,22 +46,13 @@
 #define E1000_RAL	0x05400/4 /* Receive addr lo*/
 #define E1000_RAH	0x05404/4 /* Receive addr hi*/
 
-#define E1000_RCTL     0x00100/4  /* RX Control - RW */
+#define E1000_RCTL     0x0040  /* RX Control - RW */ //KK changed it from 0x00100 to 0x00400
 #define E1000_RCTL_EN             0x00000002    /* enable */
 #define E1000_RCTL_LPE            0x00000020    /* long packet enable */
-
-#define E1000_RCTL_LBM_NO         0x00000000    /* no loopback mode */
-#define E1000_RCTL_LBM_MAC        0x00000040    /* MAC loopback mode */
-#define E1000_RCTL_LBM_SLP        0x00000080    /* serial link loopback mode */
-#define E1000_RCTL_LBM_TCVR       0x000000C0    /* tcvr loopback mode */
-#define E1000_RCTL_LBM	E1000_RCTL_LBM_MAC //not sure about this, might want to try all four above in debugging
-
-#define E1000_RCTL_MO           0x00003000    /* multicast offset 15:4 */ //chose a specific one, MO_3
-#define E1000_RCTL_BAM            0x00008000    /* broadcast enable */
-#define E1000_RCTL_SZ         0x00030000    /* rx buffer size 256 */ //assuming BSEX to be 0, and this is SZ_256
+#define E1000_RCTL_BAM            0x00008000
+#define E1000_RCTL_SZ         0x0000000    /* rx buffer size 256 */ //assuming BSEX to be 0, and this is SZ_256
 #define E1000_RCTL_SECRC          0x04000000    /* Strip Ethernet CRC */
 
-#define E1000_RCTL_RDMTS	0x300		/* descriptor minimum threshold size */ //manually created
 #define E1000_MTA		0x5200/4
 
 #define E1000_EERD_START	0x1
@@ -70,7 +61,7 @@
 volatile uint32_t* e1000;
 int e1000_attach(struct pci_func *pcifunc);
 int e1000_transmit (char *data, int len);
-int e1000_receive (char **data, int* len);
+int e1000_receive (char *data);//, int* len);
 
 struct tx_desc
 {
@@ -93,9 +84,9 @@ struct rx_desc
 {	
 	uint64_t addr;
 	uint16_t length;
-	uint8_t checksum;
+	uint16_t chksum;
 	uint8_t status;
-	uint8_t error;
+	uint8_t errors;
 	uint16_t special;
 };
 

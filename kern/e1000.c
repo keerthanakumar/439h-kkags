@@ -55,12 +55,13 @@ e1000_attach(struct pci_func *pcifunc) {
 	e1000[E1000_TIPG] = (0x6 << 20)|(0x8 << 10)|(0xa);
 
 	//RECEIVE
-	memset(rx_bufs, 0, sizeof(struct rx_desc) * E1000_RX_DESC);
-	memset(rx_pkt_bufs, 0, sizeof(struct rx_pkt) * E1000_RX_DESC);
+//	memset(rx_bufs, 0, sizeof(struct rx_desc) * E1000_RX_DESC);
+//	memset(rx_pkt_bufs, 0, sizeof(struct rx_pkt) * E1000_RX_DESC);
 
 	for (i = 0; i < E1000_RX_DESC; i++) {
 		rx_bufs[i].addr = PADDR(rx_pkt_bufs[i].buf);
-//		rx_bufs[i].status &= ~E1000_RXD_STATUS_DD;
+		rx_bufs[i].status = 0;
+//	rx_bufs[i].status |= E1000_RXD_STATUS_DD;
 //		rx_bufs[i].status &= ~E1000_RXD_STAT_EOP;
 	}
 
@@ -71,22 +72,18 @@ e1000_attach(struct pci_func *pcifunc) {
 	e1000[E1000_RDBAL] = PADDR(rx_bufs);
 	e1000[E1000_RDBAH] = 0;
 
-	e1000[E1000_RDLEN] = sizeof(rx_bufs);
+	e1000[E1000_RDLEN] = sizeof(struct rx_desc) * E1000_RX_DESC;
 
 	//control registers
 	e1000[E1000_RCTL] = 0;
-	e1000[E1000_RCTL] |= E1000_RCTL_EN;
-	e1000[E1000_RCTL] &= ~E1000_RCTL_LPE;
-	e1000[E1000_RCTL] &= ~E1000_RCTL_LBM;
-	e1000[E1000_RCTL] &= ~E1000_RCTL_RDMTS;
-	e1000[E1000_RCTL] &= ~E1000_RCTL_MO;
-	e1000[E1000_RCTL] |= E1000_RCTL_BAM;
-	e1000[E1000_RCTL] &= ~E1000_RCTL_SZ;
+//	e1000[E1000_RCTL] |= E1000_RCTL_SZ;
 	e1000[E1000_RCTL] |= E1000_RCTL_SECRC;
-	
+	e1000[E1000_RCTL] |= E1000_RCTL_BAM;
+		
 	//KK thinks this is wrong
 	e1000[E1000_RAL] = 0x12005452;
 	e1000[E1000_RAH] = 0x80005634;
+	e1000[E1000_RCTL] |= E1000_RCTL_EN;
 
 	return 0;
 }
@@ -119,37 +116,53 @@ e1000_transmit (char *data, int len) {
 }
 
 int
-e1000_receive (char** data, int* len) {
-	cprintf("kern/e1000.c, e1000_receive: called\n");
-
+e1000_receive (char*  data){//, int* len) {
+//	cprintf("kern/e1000.c, e1000_receive: called\n");
+	int len;
 	int rdt = e1000[E1000_RDT];
-	cprintf("kern/e1000.c, e1000_receive: rdt = %d,\n", e1000[E1000_RDT]);
-	cprintf("\tstatus = %p (DD = %p & EOP = %p)\n", rx_bufs[rdt].status, E1000_RXD_STATUS_DD, E1000_RXD_STAT_EOP);
-	cprintf("\tlength = %d\n", rx_bufs[rdt].length);
+	//cprintf("kern/e1000.c, e1000_receive: rdt = %p,\n", &e1000[E1000_RDT]);
+//	cprintf("\tstatus = %p (DD = %p & EOP = %p)\n", rx_bufs[rdt].status, E1000_RXD_STATUS_DD, E1000_RXD_STAT_EOP);
+//	cprintf("\tlength = %d, data add = %p \n", rx_bufs[rdt].length, rx_bufs[rdt].addr);
+//	if (rx_bufs[rdt].status & E1000_RXD_STATUS_DD){
+//		if(!(rx_bufs[rdt].status & E1000_RXD_STAT_EOP)){
+//			return -E_PKT_TOO_LONG;
+//		}
+//		*len = rx_bufs[rdt].length;
+//		memmove(*data, rx_pkt_bufs[rdt].buf, *len);
+	int i;
+	for (i = 0; i < 64; i++){
+		cprintf("\t%p, %d\t", rx_bufs[i].status, rx_bufs[i].length);
+	}
+	cprintf("\n");
 	if (!(rx_bufs[rdt].status & E1000_RXD_STATUS_DD)) {
-		cprintf("kern/e1000.c, e1000_receive: status is not DD\n");
+	//	cprintf("kern/e1000.c, e1000_receive: status is DD\n");
 		return -E_RX_TRYAGAIN;
 	}
-	if (!(rx_bufs[rdt].status & E1000_RXD_STAT_EOP)) {
-		cprintf("kern/e1000.c, e1000_receive: the packet's too big\n");
+//	if (!(rx_bufs[rdt].status & E1000_RXD_STAT_EOP)) {
+//		cprintf("kern/e1000.c, e1000_receive: the packet's too big\n");
 //		while ((rx_bufs[rdt].status & E1000_RXD_STAT_EOP) == 0) {
 //			rx_bufs[rdt].status &= ~E1000_RXD_STATUS_DD;
 //			rdt = (rdt + 1) % E1000_RX_DESC;
 //		}
-		e1000[E1000_RDT] = (rdt + 1) % E1000_RX_DESC;
-		return -E_PKT_TOO_LONG;
-	}
-	*len = rx_bufs[rdt].length;
-	cprintf("kern/e1000.c, e1000_receive: obtained length = %d\n", *len);
-	int i;
+//		e1000[E1000_RDT] = (rdt + 1) % E1000_RX_DESC;
+//		return -E_PKT_TOO_LONG;
+//	}
+	len = rx_bufs[rdt].length;
+	rx_bufs[rdt].length = 0;
+//	cprintf("kern/e1000.c, e1000_receive: obtained length = %d\n", *len);
+	memcpy(data,rx_pkt_bufs[rdt].buf, len);
+/*	int i;
 	for (i = 0; i < *len; i++) {
 		(*data)[i] = rx_pkt_bufs[rdt].buf[i];
-		cprintf("\twrote %c to byte %d/%d of buf %d\n", data[i], i, *len, rdt);
-	}
+//		cprintf("\twrote %c to byte %d/%d of buf %d\n", data[i], i, *len, rdt);
+	}*/
 	rx_bufs[rdt].status &= ~E1000_RXD_STATUS_DD;
 	rx_bufs[rdt].status &= ~E1000_RXD_STAT_EOP;
 	e1000[E1000_RDT] = (rdt + 1) % E1000_RX_DESC;
 
-	cprintf("kern/e1000.c, e1000_receive, before return: data = %p, len = %d\n", **data, *len);
-	return 0;;
+//	cprintf("kern/e1000.c, e1000_receive, before return: data = %p, len = %d\n", **data, *len);
+	return len;
+//	}
+//	cprintf("nothing happened\n");
+//	return -E_RX_TRYAGAIN;
 }

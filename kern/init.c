@@ -83,12 +83,18 @@ i386_init(void)
 #else
 	// Touch all you want.
 //cprintf("\ntestoutput env creating...\n");
-//	ENV_CREATE(net_testoutput, ENV_TYPE_USER);
+//	ENV_CREATE(net_testinput, ENV_TYPE_USER);
 //	ENV_CREATE(user_echosrv, ENV_TYPE_USER);
+//	ENV_CREATE(net_testoutput, ENV_TYPE_USER);
 //	ENV_CREATE(user_httpd, ENV_TYPE_USER);
 //	ENV_CREATE(user_yield, ENV_TYPE_USER);
 #endif // TEST*
 	// Schedule and run the first user environment!
+//	e1000_transmit("LOL", 3);
+//	char** data;
+//	int* len;
+//	while(e1000_receivee(data, len) < 0);
+//	cprintf("I received:\n");
 	sched_yield();
 }
 
