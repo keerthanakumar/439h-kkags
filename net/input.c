@@ -14,7 +14,7 @@ input(envid_t ns_envid)
 	// reading from it for a while, so don't immediately receive
 	// another packet in to the same physical page.
 
-	/*
+	
 		char buf[RECV_BUF_SIZE]; //RECEIVER BUFFER SIZE
 		int r;
 		int perm  = PTE_U | PTE_P | PTE_W;
@@ -29,5 +29,5 @@ input(envid_t ns_envid)
 			
 			while((r = sys_ipc_try_send(ns_envid, NSREQ_INPUT, &nsipcbuf, perm)) < 0);
 		}
-	*/
+
 }
