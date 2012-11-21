@@ -7,6 +7,8 @@
 // LAB 6: Your driver code here
 struct tx_desc tx_bufs[E1000_TX_DESC];
 struct tx_pkt tx_pkt_bufs[E1000_TX_DESC];
+struct rx_desc rx_bufs[E1000_RX_DESC];
+struct rx_pkt rx_pkt_bufs[E1000_RX_DESC];
 
 int
 e1000_attach(struct pci_func *pcifunc) {
@@ -51,6 +53,37 @@ e1000_attach(struct pci_func *pcifunc) {
 
 	//register bit descriptors, part deux
 	e1000[E1000_TIPG] = (0x6 << 20)|(0x8 << 10)|(0xa);
+
+	//RECEIVE
+	memset(rx_bufs, 0, sizeof(struct rx_desc) * E1000_RX_DESC);
+	memset(rx_pkt_bufs, 0, sizeof(struct rx_pkt) * E1000_RX_DESC);
+
+	for (i = 0; i < E1000_RX_DESC; i++) {
+		rx_bufs[i].addr = PADDR(rx_pkt_bufs[i].buf);
+		rx_bufs[i].status |= E1000_RXD_STATUS_DD;
+	}
+
+	e1000[E1000_RDH] = 0;
+	e1000[E1000_RDT] = 0;
+	e1000[E1000_RDBAL] = PADDR(rx_bufs);
+	e1000[E1000_RDBAH] = 0;
+
+	e1000[E1000_RDLEN] = sizeof(rx_bufs);
+
+	//control registers
+	e1000[E1000_RCTL] = 0;
+	e1000[E1000_RCTL] |= E1000_RCTL_EN;
+	e1000[E1000_RCTL] &= ~E1000_RCTL_LPE;
+	e1000[E1000_RCTL] &= ~E1000_RCTL_LBM;
+	e1000[E1000_RCTL] &= ~E1000_RCTL_RDMTS;
+	e1000[E1000_RCTL] &= ~E1000_RCTL_MO;
+	e1000[E1000_RCTL] |= E1000_RCTL_BAM;
+	e1000[E1000_RCTL] &= ~E1000_RCTL_SZ;
+	e1000[E1000_RCTL] |= E1000_RCTL_SECRC;
+	
+	//KK thinks this is wrong
+	e1000[E1000_RAL] = 0x12005452;
+	e1000[E1000_RAH] = 0x80005634;
 
 	return 0;
 }
