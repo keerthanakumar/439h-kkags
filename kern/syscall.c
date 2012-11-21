@@ -478,6 +478,12 @@ sys_net_receive(char* data){//, int* len){
 	//cprintf("kern/syscall.c, sys_net_receive(): data = %c, len = %d\n", *data, *len);
 	return r;
 }
+static int 
+sys_get_mac(uint32_t *low, uint32_t *high){
+	*low = e1000[E1000_RAL];
+	*high = e1000[E1000_RAH] & 0xffff;
+	return 0;
+}
 
 // Dispatches to the correct kernel function, passing the arguments.
 int32_t
@@ -541,6 +547,9 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 			break;
 		case SYS_net_receive:
 			return_value = sys_net_receive((char *) a1);
+			break;
+		case SYS_get_mac:
+			return_value = sys_get_mac((uint32_t *) a1, (uint32_t *)a2);
 			break;
 		default:
 			return_value = -E_INVAL;
