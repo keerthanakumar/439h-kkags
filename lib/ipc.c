@@ -80,7 +80,6 @@ ipc_recv(envid_t *from_env_store, void *pg, int *perm_store)
 void
 ipc_send(envid_t to_env, uint32_t val, void *pg, int perm)
 {
-	cprintf("\tlib/ipc.c, ipc_send(): called, val = %p\n", val);
 	// LAB 4: Your code here.
 	if(!pg){
 		pg = (void *) UTOP;
@@ -96,14 +95,12 @@ ipc_send(envid_t to_env, uint32_t val, void *pg, int perm)
 			//cprintf("The type of ipc error %e\n", k);
 			//panic("Error in ipc send\n");
 		}*/
-		cprintf("\t\tlib/ipc.c, ipc_send(): while loop iteration, about to call sys_yield(), val = %p\n", val);
 		sys_yield();
 		k = sys_ipc_try_send(to_env, val, pg, perm);
 	}
 	if (k < 0) {
 		panic("ipc_try_send failed: %e", k);
 	}
-	cprintf("\t\tlib/ipc.c, ipc_send(): send succeeded, val = %p\n", val);
 }
 
 // Find the first environment of the given type.  We'll use this to

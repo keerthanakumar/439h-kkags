@@ -65,10 +65,27 @@ e1000_attach(struct pci_func *pcifunc) {
 	e1000[E1000_RCTL] |= E1000_RCTL_SECRC;
 	e1000[E1000_RCTL] |= E1000_RCTL_BAM;
 		
-	e1000[E1000_RAL] = 0x12005452;
-	e1000[E1000_RAH] = 0x80005634;
+//	e1000[E1000_RAL] = 0x12005452;
+//	e1000[E1000_RAH] = 0x80005634;
 	e1000[E1000_RCTL] |= E1000_RCTL_EN;
 
+//MAC Address initialization
+	e1000[E1000_EERD] = 0x0;
+	e1000[E1000_EERD] |= E1000_EERD_START;
+	while (!(e1000[E1000_EERD] & E1000_EERD_DONE));
+	e1000[E1000_RAL] = e1000[E1000_EERD] >> 16;
+
+	e1000[E1000_EERD] = 0x1 << 8;
+	e1000[E1000_EERD] |= E1000_EERD_START;
+	while (!(e1000[E1000_EERD] & E1000_EERD_DONE));
+	e1000[E1000_RAL] |= e1000[E1000_EERD] & 0xffff0000;
+
+	e1000[E1000_EERD] = 0x2 << 8;
+	e1000[E1000_EERD] |= E1000_EERD_START;
+	while (!(e1000[E1000_EERD] & E1000_EERD_DONE));
+	e1000[E1000_RAH] = e1000[E1000_EERD] >> 16;
+
+	e1000[E1000_RAH] |= 0x1 << 31;
 	return 0;
 }
 
@@ -104,10 +121,6 @@ e1000_receive (char*  data){
 	int len;
 	int rdt = e1000[E1000_RDT];
 	int i;
-	for (i = 0; i < 64; i++){
-		cprintf("\t%p, %d\t", rx_bufs[i].status, rx_bufs[i].length);
-	}
-	cprintf("\n");
 	if (!(rx_bufs[rdt].status & E1000_RXD_STATUS_DD)) {
 		return -E_RX_TRYAGAIN;
 	}
