@@ -116,9 +116,30 @@ e1000_transmit (char *data, int len) {
 }
 
 int
-e1000_receive (char* data, int* len) {
+e1000_receive (char** data, int* len) {
 	cprintf("kern/e1000.c, e1000_receive: called\n");
-	*data = "lol";
-	*len = 3;
+
+	int rdt = e1000[E1000_RDT];
+	cprintf("kern/e1000.c, e1000_receive: rdt = %d,\n", e1000[E1000_RDT]);
+	cprintf("\tstatus = %p (DD = %p & EOP = %p)\n", rx_bufs[rdt].status, E1000_RXD_STATUS_DD, E1000_RXD_STAT_EOP);
+	if (!(rx_bufs[rdt].status & E1000_RXD_STATUS_DD)) {
+		cprintf("kern/e1000.c, e1000_receive: status is not DD\n");
+		return -E_RX_FULL;
+	}
+//	if (!(rx_bufs[rdt].status & E1000_RXD_STAT_EOP)) {
+//		cprintf("kern/e1000.c, e1000_receive: the packet's too big\n");
+//		return -E_PKT_TOO_LONG;
+//	}
+	*len = rx_bufs[rdt].length;
+	int i;
+	for (i = 0; i < *len; i++) {
+		(*data)[i] = rx_pkt_bufs[rdt].buf[i];
+		cprintf("\twrote %c to byte %d/%d of buf %d\n", data[i], i, *len, rdt);
+	}
+	rx_bufs[rdt].status &= ~E1000_RXD_STATUS_DD;
+	rx_bufs[rdt].status &= ~E1000_RXD_STAT_EOP;
+	e1000[E1000_RDT] = (rdt + 1) % E1000_RX_DESC;
+
+	cprintf("kern/e1000.c, e1000_receive, before return: data = %p, len = %d\n", **data, *len);
 	return 0;;
 }

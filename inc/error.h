@@ -27,6 +27,7 @@ enum {
 	E_NOT_SUPP	= 15,	// Operation not supported
 	E_PKT_TOO_LONG 	= 16,	// Packet for IPC transmit it soo long
 	E_TX_FULL	= 17,	// This state ain't big enough for the two of us!
+	E_RX_FULL	= 18,
 
 	MAXERROR
 };

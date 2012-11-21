@@ -471,10 +471,10 @@ static int
 sys_net_receive(char* data, int* len){
 	if((uintptr_t) data >=UTOP)
 		return -E_INVAL;
-	*len = e1000_receive(data);
-	if(*len > 0)
-		return 0;
-	return *len;
+	int r;
+	r = e1000_receive(&data, len);
+	cprintf("kern/syscall.c, sys_net_receive(): data = %c, len = %d\n", *data, *len);
+	return r;
 }
 
 // Dispatches to the correct kernel function, passing the arguments.

@@ -23,11 +23,11 @@ input(envid_t ns_envid)
 		int i;
 		while(1) {
 			cprintf("net/input.c: about to try sys_net_receive\n");
-			while((len = sys_net_receive(buf, &len)) < 0) {
+			while((r = sys_net_receive(buf, &len)) < 0) {
 				cprintf("net/input.c: tried sys_net_receive, yielding\n");
 				sys_yield();
 			}
-			cprintf("net/input.c: sys_net_receive success, len = %d\n", len);
+			cprintf("net/input.c: sys_net_receive success, data = %c, len = %d\n", buf[0], len);
 			while((r = sys_page_alloc(0, &nsipcbuf, perm))<0);
 			cprintf("net/input.c: page_alloc success\n");
 			nsipcbuf.pkt.jp_len = len;
