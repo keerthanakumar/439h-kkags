@@ -50,7 +50,6 @@ ipc_recv(envid_t *from_env_store, void *pg, int *perm_store)
 	}
 
 	value = sys_ipc_recv(pg);
-	cprintf("\t ipc_rec called and progress\n");
 	if(value < 0){
 		sender = 0;
 		perm = 0;

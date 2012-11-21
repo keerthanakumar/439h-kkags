@@ -101,7 +101,7 @@ umain(int argc, char **argv)
 
 		cprintf("net/testinput.c: about to call ipc_recv\n");
 		int32_t req = ipc_recv((int32_t *)&whom, pkt, &perm);
-		cprintf("net/testinput.c: called ipc_recv\n");
+		cprintf("net/testinput.c: called ipc_recv, pkt->jp_len = %d\n", pkt->jp_len);
 		if (req < 0)
 			panic("ipc_recv: %e", req);
 		if (whom != input_envid)

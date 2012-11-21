@@ -14,20 +14,30 @@ input(envid_t ns_envid)
 	// reading from it for a while, so don't immediately receive
 	// another packet in to the same physical page.
 
-	
+//iwejfsivhj
+#define RECV_BUF_SIZE 1518	
 		char buf[RECV_BUF_SIZE]; //RECEIVER BUFFER SIZE
 		int r;
 		int perm  = PTE_U | PTE_P | PTE_W;
 		int len = RECV_BUF_SIZE - 1;
 		int i;
-		while(1){
-			while((r = sys_net_receive(buf, &len)) < 0){
-				sys_yeild();
+		while(1) {
+			cprintf("net/input.c: about to try sys_net_receive\n");
+			while((len = sys_net_receive(buf, &len)) < 0) {
+				cprintf("net/input.c: tried sys_net_receive, yielding\n");
+				sys_yield();
+			}
+			cprintf("net/input.c: sys_net_receive success, len = %d\n", len);
 			while((r = sys_page_alloc(0, &nsipcbuf, perm))<0);
-			nsipcbuf.pkt.jp.len = len;
+			cprintf("net/input.c: page_alloc success\n");
+			nsipcbuf.pkt.jp_len = len;
 			memmove(nsipcbuf.pkt.jp_data, buf, len);
-			
+
+			cprintf("net/input.c: about to call sys_ipc_try_send, nsipcbuf.pkt.jp_data = %c, len = %d\n", nsipcbuf.pkt.jp_data, nsipcbuf.pkt.jp_len);	
 			while((r = sys_ipc_try_send(ns_envid, NSREQ_INPUT, &nsipcbuf, perm)) < 0);
+			cprintf("net/input.c: sys_ipc_try_send success\n");
+			
+			sys_page_unmap(0, &nsipcbuf);
 		}
 
 }

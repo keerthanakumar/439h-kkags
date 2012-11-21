@@ -127,3 +127,8 @@ int
 sys_net_send(char* data, int len) {
 	return syscall(SYS_net_send, 0, (uint32_t)data, len, 0, 0, 0);
 }
+
+int
+sys_net_receive(char* data, int* len) {
+	return syscall(SYS_net_receive, 0, (uint32_t)data, (uint32_t)len, 0, 0, 0); //iwejfsivhj - perhaps should be casted as int?
+}
