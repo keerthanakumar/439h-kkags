@@ -126,11 +126,17 @@ e1000_receive (char** data, int* len) {
 		cprintf("kern/e1000.c, e1000_receive: status is not DD\n");
 		return -E_RX_FULL;
 	}
-//	if (!(rx_bufs[rdt].status & E1000_RXD_STAT_EOP)) {
-//		cprintf("kern/e1000.c, e1000_receive: the packet's too big\n");
-//		return -E_PKT_TOO_LONG;
-//	}
+	if (!(rx_bufs[rdt].status & E1000_RXD_STAT_EOP)) {
+		cprintf("kern/e1000.c, e1000_receive: the packet's too big\n");
+		while (rx_bufs[rdt].status & E1000_RXD_STAT_EOP == 0) {
+			rx_bufs[rdt].status &= ~E1000_RXD_STATUS_DD;
+			rdt = (rdt + 1) % E1000_RX_DESC;
+		}
+		e1000[E1000_RDT] = (rdt + 1) % E1000_RX_DESC;
+		return -E_PKT_TOO_LONG;
+	}
 	*len = rx_bufs[rdt].length;
+	cprintf("kern/e1000.c, e1000_receive: obtained length = %d\n", *len);
 	int i;
 	for (i = 0; i < *len; i++) {
 		(*data)[i] = rx_pkt_bufs[rdt].buf[i];
