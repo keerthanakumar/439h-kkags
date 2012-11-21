@@ -23,6 +23,7 @@ umain(int argc, char **argv)
 	if (output_envid < 0)
 		panic("error forking");
 	else if (output_envid == 0) {
+		cprintf("net/testoutput.c: child starting\n");
 		output(ns_envid);
 		return;
 	}

@@ -91,6 +91,7 @@ e1000_attach(struct pci_func *pcifunc) {
 
 int 
 e1000_transmit (char *data, int len) {
+	cprintf("e1000_transmit called\n");
 	int numBufs = len % TX_PKT_SIZE == 0 ? len / TX_PKT_SIZE : len / TX_PKT_SIZE + 1;
 	int tdt = e1000[E1000_TDT];
 
