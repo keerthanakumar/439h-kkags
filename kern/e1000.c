@@ -118,5 +118,7 @@ e1000_transmit (char *data, int len) {
 int
 e1000_receive (char* data, int* len) {
 	cprintf("kern/e1000.c, e1000_receive: called\n");
-	return -1;
+	*data = "lol";
+	*len = 3;
+	return 0;;
 }
