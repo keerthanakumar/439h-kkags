@@ -243,35 +243,27 @@ send_file(struct http_request *req)
 		r = fd;
 		goto end;
 	}
-	cprintf("send_file fileopen\n");
 	if ((r = fstat(fd, &stat)) < 0) {
 		send_error(req, 404);
 		goto end;
 	}
-	cprintf("send_file fstat\n");
 	if (stat.st_isdir) {
 		send_error(req, 404);
-		cprintf("send_file just sent error\n");
 		r = -11;
 		goto end;
 	}
-	cprintf("send_file st_isdir\n");
 	file_size = stat.st_size;
 	if ((r = send_header(req, 200)) < 0)
 		goto end;
-	cprintf("send_file send_header\n");
 
 	if ((r = send_size(req, file_size)) < 0)
 		goto end;
-	cprintf("send_file send_size\n");
 
 	if ((r = send_content_type(req)) < 0)
 		goto end;
-	cprintf("send_file send_content_type\n");
 
 	if ((r = send_header_fin(req)) < 0)
 		goto end;
-	cprintf("send_file send_header_fin\n");
 
 	r = send_data(req, fd);
 
