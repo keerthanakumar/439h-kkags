@@ -60,7 +60,8 @@ e1000_attach(struct pci_func *pcifunc) {
 
 	for (i = 0; i < E1000_RX_DESC; i++) {
 		rx_bufs[i].addr = PADDR(rx_pkt_bufs[i].buf);
-		rx_bufs[i].status |= E1000_RXD_STATUS_DD;
+		rx_bufs[i].status &= ~E1000_RXD_STATUS_DD;
+		rx_bufs[i].status &= ~E1000_RXD_STAT_EOP;
 	}
 
 	e1000[E1000_RDH] = 0;
@@ -122,16 +123,17 @@ e1000_receive (char** data, int* len) {
 	int rdt = e1000[E1000_RDT];
 	cprintf("kern/e1000.c, e1000_receive: rdt = %d,\n", e1000[E1000_RDT]);
 	cprintf("\tstatus = %p (DD = %p & EOP = %p)\n", rx_bufs[rdt].status, E1000_RXD_STATUS_DD, E1000_RXD_STAT_EOP);
+	cprintf("\tlength = %d\n", rx_bufs[rdt].length);
 	if (!(rx_bufs[rdt].status & E1000_RXD_STATUS_DD)) {
 		cprintf("kern/e1000.c, e1000_receive: status is not DD\n");
-		return -E_RX_FULL;
+		return -E_RX_TRYAGAIN;
 	}
 	if (!(rx_bufs[rdt].status & E1000_RXD_STAT_EOP)) {
 		cprintf("kern/e1000.c, e1000_receive: the packet's too big\n");
-		while (rx_bufs[rdt].status & E1000_RXD_STAT_EOP == 0) {
-			rx_bufs[rdt].status &= ~E1000_RXD_STATUS_DD;
-			rdt = (rdt + 1) % E1000_RX_DESC;
-		}
+//		while ((rx_bufs[rdt].status & E1000_RXD_STAT_EOP) == 0) {
+//			rx_bufs[rdt].status &= ~E1000_RXD_STATUS_DD;
+//			rdt = (rdt + 1) % E1000_RX_DESC;
+//		}
 		e1000[E1000_RDT] = (rdt + 1) % E1000_RX_DESC;
 		return -E_PKT_TOO_LONG;
 	}
