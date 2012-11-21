@@ -227,7 +227,6 @@ send_error(struct http_request *req, int code)
 static int
 send_file(struct http_request *req)
 {
-	cprintf("send_file called\n");
 	int r;
 	off_t file_size = -1;
 	int fd;
@@ -238,11 +237,8 @@ send_file(struct http_request *req)
 	// set file_size to the size of the file
 
 	// LAB 6: Your code here.
-	//`panic("send_file not implemented");
-	char path[MAXPATHLEN];
 	struct Stat stat;
-	memmove(path, req->url, strlen(req->url));
-	if ((fd = open(path, O_RDONLY)) < 0){
+	if ((r = fd = open(req->url, O_RDONLY)) < 0){
 		send_error(req, 404);
 		r = fd;
 		goto end;
