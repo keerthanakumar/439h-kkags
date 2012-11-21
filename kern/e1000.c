@@ -60,9 +60,11 @@ e1000_attach(struct pci_func *pcifunc) {
 
 	for (i = 0; i < E1000_RX_DESC; i++) {
 		rx_bufs[i].addr = PADDR(rx_pkt_bufs[i].buf);
-		rx_bufs[i].status &= ~E1000_RXD_STATUS_DD;
-		rx_bufs[i].status &= ~E1000_RXD_STAT_EOP;
+//		rx_bufs[i].status &= ~E1000_RXD_STATUS_DD;
+//		rx_bufs[i].status &= ~E1000_RXD_STAT_EOP;
 	}
+
+	e1000[E1000_MTA] = 0;
 
 	e1000[E1000_RDH] = 0;
 	e1000[E1000_RDT] = 0;

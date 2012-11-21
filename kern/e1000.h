@@ -62,6 +62,7 @@
 #define E1000_RCTL_SECRC          0x04000000    /* Strip Ethernet CRC */
 
 #define E1000_RCTL_RDMTS	0x300		/* descriptor minimum threshold size */ //manually created
+#define E1000_MTA		0x5200/4
 
 #define E1000_EERD_START	0x1
 #define E1000_EERD_DONE		0x10
