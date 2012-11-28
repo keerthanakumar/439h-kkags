@@ -25,6 +25,10 @@ enum {
 	E_FILE_EXISTS	= 13,	// File already exists
 	E_NOT_EXEC	= 14,	// File not a valid executable
 	E_NOT_SUPP	= 15,	// Operation not supported
+	E_PKT_TOO_LONG 	= 16,	// Packet for IPC transmit it soo long
+	E_TX_FULL	= 17,	// This state ain't big enough for the two of us!
+	E_RX_FULL	= 18,
+	E_RX_TRYAGAIN	= 19,
 
 	MAXERROR
 };

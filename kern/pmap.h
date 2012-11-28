@@ -17,6 +17,9 @@ extern size_t npages;
 
 extern pde_t *kern_pgdir;
 
+//CHANGE
+extern int num_free_pages(void);
+//ENDCHANGE
 
 /* This macro takes a kernel virtual address -- an address that points above
  * KERNBASE, where the machine's maximum 256MB of physical memory is mapped --
@@ -52,7 +55,7 @@ enum {
 };
 
 void	mem_init(void);
-
+void boot_map_region(pde_t *pgdir, uintptr_t va, size_t size, physaddr_t pa, int perm);
 void	page_init(void);
 struct Page *page_alloc(int alloc_flags);
 void	page_free(struct Page *pp);

@@ -16,6 +16,7 @@
 #include <kern/spinlock.h>
 #include <kern/time.h>
 #include <kern/pci.h>
+#include <kern/e1000.h>
 
 static void boot_aps(void);
 
@@ -57,14 +58,16 @@ i386_init(void)
 
 	// Acquire the big kernel lock before waking up APs
 	// Your code here:
+	lock_kernel();
 
 	// Starting non-boot CPUs
 	boot_aps();
 
 	// Should always have idle processes at first.
 	int i;
-	for (i = 0; i < NCPU; i++)
+	for (i = 0; i < NCPU; i++) {
 		ENV_CREATE(user_idle, ENV_TYPE_IDLE);
+	}
 
 	// Start fs.
 	ENV_CREATE(fs_fs, ENV_TYPE_FS);
@@ -85,6 +88,13 @@ i386_init(void)
 	// Should not be necessary - drains keyboard because interrupt has given up.
 	kbd_intr();
 
+//cprintf("\ntestoutput env creating...\n");
+//	ENV_CREATE(net_testinput, ENV_TYPE_USER);
+//	ENV_CREATE(user_echosrv, ENV_TYPE_USER);
+//	ENV_CREATE(net_testoutput, ENV_TYPE_USER);
+//	ENV_CREATE(user_httpd, ENV_TYPE_USER);
+//	ENV_CREATE(user_yield, ENV_TYPE_USER);
+#endif // TEST*
 	// Schedule and run the first user environment!
 	sched_yield();
 }
@@ -139,9 +149,9 @@ mp_main(void)
 	// only one CPU can enter the scheduler at a time!
 	//
 	// Your code here:
-
-	// Remove this after you finish Exercise 4
-	for (;;);
+	lock_kernel();
+	sched_yield();
+	//unlock_kernel();
 }
 
 /*

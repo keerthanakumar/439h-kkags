@@ -18,6 +18,9 @@ enum {
 	SYS_ipc_try_send,
 	SYS_ipc_recv,
 	SYS_time_msec,
+	SYS_net_send,
+	SYS_net_receive,
+	SYS_get_mac,
 	NSYSCALLS
 };
 

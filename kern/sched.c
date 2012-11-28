@@ -3,15 +3,17 @@
 #include <kern/env.h>
 #include <kern/pmap.h>
 #include <kern/monitor.h>
+#include <kern/e1000.h>
 
+#define CUSTOM_SCHED 0
 
 // Choose a user environment to run and run it.
 void
 sched_yield(void)
 {
-	struct Env *idle;
 	int i;
-
+	struct Env *idle;
+	if (!CUSTOM_SCHED) {
 	// Implement simple round-robin scheduling.
 	//
 	// Search through 'envs' for an ENV_RUNNABLE environment in
@@ -29,6 +31,50 @@ sched_yield(void)
 	// below to switch to this CPU's idle environment.
 
 	// LAB 4: Your code here.
+	uint32_t envid = curenv ? ENVX(curenv->env_id) : 0;
+	uint32_t firsteid = (++envid) % NENV;
+	uint32_t nexteid;
+	int foundAGoodOne = 0;
+	for (i = 0; i < NENV; i++) {
+	       nexteid = (firsteid + i) % NENV;
+	       if (envs[nexteid].env_type != ENV_TYPE_IDLE && envs[nexteid].env_status == ENV_RUNNABLE) {
+		       env_run(&envs[nexteid]);
+			foundAGoodOne = 1;
+			break;
+	       }
+	}
+	if (curenv && curenv->env_type != ENV_TYPE_IDLE && curenv->env_status == ENV_RUNNING && !foundAGoodOne){
+			env_run(curenv);
+	}
+
+	}
+
+	//our dynamic-priority scheduler (challenge problem)
+	/*else {
+		static int numRuns = 0;
+		if (numRuns && curenv->env_type != ENV_TYPE_IDLE &&
+			curenv->env_status == ENV_RUNNING) {
+			numRuns--;
+			if (numRuns == 0) {
+				if (curenv->env_priority != LOW_PRI)
+					curenv->env_priority--;
+			}
+			env_run(curenv);
+		}
+
+		uint32_t envid = curenv ? ENVX(curenv->env_id) : 0;
+		uint32_t firsteid = (++envid) % NENV;
+		uint32_t nexteid;
+
+		for (i = 0; i < NENV; i++) {
+		       nexteid = (firsteid + i) % NENV;
+		       if (envs[nexteid].env_type != ENV_TYPE_IDLE &&
+				envs[nexteid].env_status == ENV_RUNNABLE) {
+				numRuns = (int)envs[nexteid].env_priority;
+			       env_run(&envs[nexteid]);
+		       }
+		}
+	}*/
 
 	// For debugging and testing purposes, if there are no
 	// runnable environments other than the idle environments,
@@ -36,9 +82,10 @@ sched_yield(void)
 	for (i = 0; i < NENV; i++) {
 		if (envs[i].env_type != ENV_TYPE_IDLE &&
 		    (envs[i].env_status == ENV_RUNNABLE ||
-		     envs[i].env_status == ENV_RUNNING))
+	     	     envs[i].env_status == ENV_RUNNING))
 			break;
 	}
+	
 	if (i == NENV) {
 		cprintf("No more runnable environments!\n");
 		while (1)
@@ -49,5 +96,6 @@ sched_yield(void)
 	idle = &envs[cpunum()];
 	if (!(idle->env_status == ENV_RUNNABLE || idle->env_status == ENV_RUNNING))
 		panic("CPU %d: No idle environment!", cpunum());
+	//cprintf("Going to run idle\n");
 	env_run(idle);
 }

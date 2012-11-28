@@ -1,0 +1,17 @@
+Keerthana Kumar
+kk8
+Andrew Sharp
+ags799
+
+Lab 5B
+
+1. Our transmit begins by calculating the number of buffers necessary to store the data. We then use nested for loops to store the data in the appropriate number of buffers - the outer for loop handles the number of buffers and the inner for loop handles the amount of bytes per buffer. At each iteration of the inner for loop we compare the total bytes written to the length so that we stop immediately after writing all the necessary bytes. We are also careful to set the EOP status before incrementing the TDT when the last buffer has been written, since incrementing the TDT will cause the hardware to react (this was a bug for a while). If there is not enough room in the ring for the data, we simply drop the packets.
+
+2. We first check the DD bit of the buffer that RDT is pointing at. If it is not set (the queue is empty), we return a TRYAGAIN error. If the DD bit is set, we copy as much data as the length indicates into our data argument, increment RDT, reset the status, and retrn the length. If a negative number is returned, it is a sign of a full queue.
+
+3. "This file came from JOS. Cheesy web page!"
+
+4. 80 hours (5B alone).
+
+CHALLENGE PROBLEM
+We added a system call called "sys_get_mac". It returns 0 and puts the MAC address into low and high integers. In kern/e1000.c, we initialize the MAC address from the start and endpoints of EEPROM read. To test this, we called sys_get_mac from net/testinput.c to change the MAC address, and it did not affect operation.

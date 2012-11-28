@@ -11,6 +11,99 @@ static int map_segment(envid_t child, uintptr_t va, size_t memsz,
 		       int fd, size_t filesz, off_t fileoffset, int perm);
 static int copy_shared_pages(envid_t child);
 
+int
+exec(const char *prog, const char **argv)
+{
+	unsigned char elf_buf[512];
+	struct Trapframe tmp_tf;
+	envid_t child;
+
+	int fd, i, r;
+	struct Elf *elf;
+	struct Proghdr *ph;
+	int perm;
+
+	if ((r = open(prog, O_RDONLY)) < 0) {
+		cprintf("\n\nr = %e\n\n", r);
+		return r;
+	}
+	fd = r;
+
+	printf("\n\nlol\n\n");
+	// Read elf header
+	elf = (struct Elf*) elf_buf;
+	if (readn(fd, elf_buf, sizeof(elf_buf)) != sizeof(elf_buf)
+	    || elf->e_magic != ELF_MAGIC) {
+		close(fd);
+		cprintf("elf magic %08x want %08x\n", elf->e_magic, ELF_MAGIC);
+		return -E_NOT_EXEC;
+	}
+	if ((r = sys_exofork()) < 0)
+		return r;
+	tmp_tf = envs[ENVX(r)].env_tf;
+	tmp_tf.tf_eip = elf->e_entry;
+	int s;
+	if ((s = init_stack(r, argv, &tmp_tf.tf_esp)) < 0)
+		return s;
+	sys_env_set_trapframe(thisenv->env_id,&tmp_tf);
+	// Set up program segments as defined in ELF header.
+	ph = (struct Proghdr*) (elf_buf + elf->e_phoff);
+	for (i = 0; i < elf->e_phnum; i++, ph++) {
+		if (ph->p_type != ELF_PROG_LOAD)
+			continue;
+		perm = PTE_P | PTE_U;
+		if (ph->p_flags & ELF_PROG_FLAG_WRITE)
+			perm |= PTE_W;
+		if ((r = map_segment(thisenv->env_id, ph->p_va, ph->p_memsz,
+				     fd, ph->p_filesz, ph->p_offset, perm)) < 0)
+			goto error;
+	}
+	close(fd);
+	fd = -1;
+
+	if ((r = sys_env_set_trapframe(thisenv->env_id, (struct Trapframe*)&thisenv->env_tf)) < 0)
+		panic("sys_env_set_trapframe: %e", r);
+
+	if ((r = sys_env_set_status(thisenv->env_id, ENV_RUNNABLE)) < 0)
+		panic("sys_env_set_status: %e", r);
+
+	return thisenv->env_id;
+
+error:
+	cprintf(" Am I destroying??\n");
+	sys_env_destroy(thisenv->env_id);
+	close(fd);
+	return r;
+}
+
+int
+execl(const char *prog, const char *arg0, ...)
+{
+	// We calculate argc by advancing the args until we hit NULL.
+	// The contract of the function guarantees that the last
+	// argument will always be NULL, and that none of the other
+	// arguments will be NULL.
+	int argc=0;
+	va_list vl;
+	va_start(vl, arg0);
+	while(va_arg(vl, void *) != NULL)
+		argc++;
+	va_end(vl);
+
+	// Now that we have the size of the args, do a second pass
+	// and store the values in a VLA, which has the format of argv
+	const char *argv[argc+2];
+	argv[0] = arg0;
+	argv[argc+1] = NULL;
+
+	va_start(vl, arg0);
+	unsigned i;
+	for(i=0;i<argc;i++)
+		argv[i+1] = va_arg(vl, const char *);
+	va_end(vl);
+	return exec(prog, argv);
+}
+
 // Spawn a child process from a program image loaded from the file system.
 // prog: the pathname of the program to run.
 // argv: pointer to null-terminated array of pointers to strings,

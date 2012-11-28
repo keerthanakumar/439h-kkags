@@ -122,3 +122,18 @@ sys_time_msec(void)
 {
 	return (unsigned int) syscall(SYS_time_msec, 0, 0, 0, 0, 0, 0);
 }
+
+int
+sys_net_send(char* data, int len) {
+	return syscall(SYS_net_send, 0, (uint32_t)data, len, 0, 0, 0);
+}
+
+int
+sys_net_receive(char* data) {
+	return syscall(SYS_net_receive, 0, (uint32_t)data, 0, 0, 0, 0); //iwejfsivhj - perhaps should be casted as int?
+}
+
+int 
+sys_get_mac(uint32_t *low, uint32_t *high){
+	return syscall(SYS_get_mac, 1, (uint32_t) low, (uint32_t) high, 0, 0, 0);
+}

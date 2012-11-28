@@ -39,7 +39,6 @@ FSIMGTXTFILES :=	$(FSIMGTXTFILES) \
 			fs/testshell.key \
 			fs/testshell.sh
 
-
 FSIMGFILES := $(FSIMGTXTFILES) $(USERAPPS)
 
 $(OBJDIR)/fs/%.o: fs/%.c fs/fs.h inc/lib.h $(OBJDIR)/.vars.USER_CFLAGS
