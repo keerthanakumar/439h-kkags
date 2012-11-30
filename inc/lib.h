@@ -22,6 +22,7 @@
 #include <inc/args.h>
 #include <inc/malloc.h>
 #include <inc/ns.h>
+#include <inc/ulib.h>
 
 #define USED(x)		(void)(x)
 
@@ -62,6 +63,10 @@ int	sys_ipc_recv(void *rcv_pg);
 unsigned int sys_time_msec(void);
 int	sys_net_send(char* data, int len);
 int 	sys_net_receive(char* data);//, int* len);
+
+//CHANGE
+static threadid_t sys_threadfork(void);
+//ENDCHANGE
 
 // This must be inlined.  Exercise for reader: why?
 static __inline envid_t __attribute__((always_inline))

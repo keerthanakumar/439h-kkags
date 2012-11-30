@@ -68,34 +68,55 @@ pgfault(struct UTrapframe *utf)
 static int
 duppage(envid_t envid, unsigned pn)
 {
-	//cprintf("\tduppage called, envid = %d, vpt[%d] = %d\n", envid, pn, vpt[pn]);
 	int r;
 
 	// LAB 4: Your code here.
 	unsigned va = pn << PGSHIFT;
-	if (!(vpt[pn] & PTE_P)) {
-		return -1;
+	if (!(vpt[pn] & PTE_P))
+		return -E_INVAL;
+
+	if (vpt[pn] & PTE_SHARE){
+		if((r = sys_page_map(0, (void*)va, envid, (void*) va, PGOFF(vpt[pn]) & PTE_SYSCALL)) < 0){
+			panic("duppage 0: fail's on sys page map\n");
+		}
+		return 0;
 	}
-	if (!((vpt[pn] & PTE_W) || (vpt[pn] & PTE_COW))) {
-		if ((r = sys_page_map(0, (void*)va, envid, (void*)va, PGOFF(vpt[pn])) )< 0) {
+	if ((vpt[pn] & PTE_W) || (vpt[pn] & PTE_COW)) {
+		if ((r = sys_page_map(0, (void*)va, envid, (void*)va, PTE_U | PTE_P | PTE_COW) )< 0) {
+			panic("duppage0: error in mapping %e\n", r);
+		}
+		if ((r = sys_page_map(envid, (void*)va, 0, (void*)va, PTE_U | PTE_P | PTE_COW) )< 0) {
 			panic("duppage0: error in mapping %e\n", r);
 		}
 	}
-	if(pn >=PGNUM(UTOP) || va >=UTOP)
-		panic("out of bounds\n");
-	if(!(vpt[pn]& PTE_U))
-		panic("Not user privilege");
-	if (sys_page_map(0, (void*)va, envid, (void*)va, PTE_P | PTE_U | PTE_COW) < 0) {
-			panic("duppage1: error in mapping");
-	}
-	if (sys_page_map(0, (void*)va, 0, (void*)va, PTE_P | PTE_U | PTE_COW) < 0) {
-			panic("duppage2: error in mapping");
-	}
-	if ((vpt[pn] & PTE_W) && (vpt[pn] & PTE_COW)) {
-	
-	panic("it's writeable and COW");
+	else {
+		if (sys_page_map(0, (void*)(pn * PGSIZE), envid, (void*)(pn * PGSIZE), PTE_P|PTE_U) < 0) {
+				panic("duppage1: error in mapping");
+		}
 	}
 	return 0;
+//	if (!(vpt[pn] & PTE_P)) {
+//		return -1;
+//	}
+//	if (!((vpt[pn] & PTE_W) || (vpt[pn] & PTE_COW)) && vpt[pn] & PTE_SHARE) {
+//		if ((r = sys_page_map(0, (void*)va, envid, (void*)va, PGOFF(vpt[pn])) )< 0) {
+//			panic("duppage0: error in mapping %e\n", r);
+//		}
+//	}
+//	if(pn >=PGNUM(UTOP) || va >=UTOP)
+//		panic("out of bounds\n");
+//	if(!(vpt[pn]& PTE_U))
+//		panic("Not user privilege");
+//	if (sys_page_map(0, (void*)va, envid, (void*)va, PTE_P | PTE_U | PTE_COW) < 0) {
+//		panic("duppage1: error in mapping");
+//	}
+//	if (sys_page_map(0, (void*)va, 0, (void*)va, PTE_P | PTE_U | PTE_COW) < 0) {
+//		panic("duppage2: error in mapping");
+//	}
+//	if ((vpt[pn] & PTE_W) && (vpt[pn] & PTE_COW)) {
+//		panic("it's writeable and COW");
+//	}
+//	return 0;
 }
 
 //

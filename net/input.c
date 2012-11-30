@@ -13,8 +13,6 @@ input(envid_t ns_envid)
 	// Hint: When you IPC a page to the network server, it will be
 	// reading from it for a while, so don't immediately receive
 	// another packet in to the same physical page.
-<<<<<<< HEAD
-=======
 #define RX_PKT_SIZE 2048	
 		char buf[RX_PKT_SIZE];
 		int r;
@@ -35,5 +33,4 @@ input(envid_t ns_envid)
 			sys_page_unmap(0, &nsipcbuf);
 		}
 
->>>>>>> lab6
 }

@@ -607,6 +607,9 @@ page_lookup(pde_t *pgdir, void *va, pte_t **pte_store)
 			if (pte_store) {
 				*pte_store = page_table_entry_pointer;
 			}
+//			else {
+//				cprintf("kern/pmap.c: page_lookup(): we don't set pte_store\n");
+//			}
 		}
 		else { //no page at va
 			return NULL;

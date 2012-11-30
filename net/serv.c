@@ -320,37 +320,21 @@ umain(int argc, char **argv)
 
 	// fork off the timer thread which will send us periodic messages
 	timer_envid = fork();
-<<<<<<< HEAD
-=======
-
->>>>>>> lab6
 	if (timer_envid < 0)
 		panic("error forking");
 	else if (timer_envid == 0) {
 		timer(ns_envid, TIMER_INTERVAL);
 		return;
 	}
-<<<<<<< HEAD
-
 	// fork off the input thread which will poll the NIC driver for input
 	// packets
 	input_envid = fork();
-=======
-	// fork off the input thread which will poll the NIC driver for input
-	// packets
-	input_envid = fork();
-
->>>>>>> lab6
 	if (input_envid < 0)
 		panic("error forking");
 	else if (input_envid == 0) {
 		input(ns_envid);
 		return;
 	}
-<<<<<<< HEAD
-
-=======
->>>>>>> lab6
 	// fork off the output thread that will send the packets to the NIC
 	// driver
 	output_envid = fork();
@@ -360,10 +344,6 @@ umain(int argc, char **argv)
 		output(ns_envid);
 		return;
 	}
-<<<<<<< HEAD
-
-=======
->>>>>>> lab6
 	// lwIP requires a user threading library; start the library and jump
 	// into a thread to continue initialization.
 	thread_init();

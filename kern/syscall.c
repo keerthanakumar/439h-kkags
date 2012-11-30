@@ -287,8 +287,8 @@ sys_page_map(envid_t srcenvid, void *srcva,
 		cprintf("sys_page_map: bad perms for syscall");
 		return -E_INVAL;
 	}
-	if ((perm & PTE_W) != 0 && (*ps & PTE_W) == 0) {
-		cprintf("sys_page_map: bad perms for write");
+	if (((perm & PTE_W) != 0) && (!(*ps & PTE_W))) {
+		cprintf("sys_page_map: bad perms for write. srcva = %p,  perm & PTE_W = %x, *ps & PTE_W = %x\n", srcva, perm & PTE_W, *ps & PTE_W);
 		return -E_INVAL;
 	}
 	if (page_insert(dst->env_pgdir, p, dstva, perm) < 0) {
@@ -383,7 +383,6 @@ sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
 	}
 
 	if((uint32_t) e->env_ipc_dstva < UTOP && (uint32_t) srcva < UTOP){
-		cprintf("\tenv wants a page\n");
 		if ((int)srcva % PGSIZE != 0) {
 			return -E_INVAL;
 		}
@@ -483,14 +482,6 @@ sys_get_mac(uint32_t *low, uint32_t *high){
 	*low = e1000[E1000_RAL];
 	*high = e1000[E1000_RAH] & 0xffff;
 	return 0;
-}
-
-// Return the current time.
-static int
-sys_time_msec(void)
-{
-	// LAB 6: Your code here.
-	panic("sys_time_msec not implemented");
 }
 
 // Dispatches to the correct kernel function, passing the arguments.

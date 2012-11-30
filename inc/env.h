@@ -6,6 +6,7 @@
 #include <inc/types.h>
 #include <inc/trap.h>
 #include <inc/memlayout.h>
+#include <inc/thread.h>
 
 typedef int32_t envid_t;
 
@@ -54,6 +55,9 @@ enum EnvPriority {
 };
 
 struct Env {
+//CHANGE
+	struct Thread thrds[NTHREAD];
+//ENDCHANGE
 	struct Trapframe env_tf;	// Saved registers
 	struct Env *env_link;		// Next free Env
 	envid_t env_id;			// Unique environment identifier

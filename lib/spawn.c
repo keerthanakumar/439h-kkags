@@ -394,6 +394,17 @@ static int
 copy_shared_pages(envid_t child)
 {
 	// LAB 7: Your code here.
+	int r;
+	int pn = UTOP / PGSIZE - 1;
+	while (--pn >= 0) {
+		if (!(vpd[pn >> 10] & PTE_P)) {
+			pn = (pn >> 10) << 10;
+		}
+		else if ((vpt[pn] & PTE_P) && (vpt[pn] & PTE_SHARE)) {
+			if ((r = sys_page_map(0, (void*)(pn * PGSIZE), child, (void*)(pn * PGSIZE), PTE_SYSCALL)) < 0)
+				return r;
+		}
+	}
 	return 0;
 }
 

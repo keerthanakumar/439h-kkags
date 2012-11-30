@@ -10,8 +10,6 @@ output(envid_t ns_envid)
 	// LAB 6: Your code here:
 	// 	- read a packet from the network server
 	//	- send the packet to the device driver
-<<<<<<< HEAD
-=======
 	int r;
 
 	while(1){
@@ -24,5 +22,4 @@ output(envid_t ns_envid)
 			cprintf("net/output.c: sys_net_send failed\n");
 		}
 	}
->>>>>>> lab6
 }

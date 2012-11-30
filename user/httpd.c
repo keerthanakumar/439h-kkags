@@ -10,11 +10,7 @@
 
 #define BUFFSIZE 512
 #define MAXPENDING 5	// Max connection requests
-<<<<<<< HEAD
-
-=======
 #define MAXPACKSIZE 1518
->>>>>>> lab6
 struct http_request {
 	int sock;
 	char *url;
@@ -81,10 +77,6 @@ static int
 send_data(struct http_request *req, int fd)
 {
 	// LAB 6: Your code here.
-<<<<<<< HEAD
-	panic("send_data not implemented");
-=======
-	cprintf("\n\nsend_data called\n\n");
 	char buf[MAXPACKSIZE];
 	int r;
 	struct Stat stat;
@@ -97,8 +89,6 @@ send_data(struct http_request *req, int fd)
 	if((r=write(req->sock, buf, stat.st_size)) != stat.st_size)
 		die("Did not write entire data");
 	return 0;
-//	panic("send_data not implemented");
->>>>>>> lab6
 }
 
 static int
@@ -204,10 +194,6 @@ http_request_parse(struct http_request *req, char *request)
 static int
 send_error(struct http_request *req, int code)
 {
-<<<<<<< HEAD
-=======
-	cprintf("send_error progress\n");
->>>>>>> lab6
 	char buf[512];
 	int r;
 
@@ -248,10 +234,6 @@ send_file(struct http_request *req)
 	// set file_size to the size of the file
 
 	// LAB 6: Your code here.
-<<<<<<< HEAD
-	panic("send_file not implemented");
-
-=======
 	struct Stat stat;
 	if ((r = fd = open(req->url, O_RDONLY)) < 0){
 		send_error(req, 404);
@@ -268,7 +250,6 @@ send_file(struct http_request *req)
 		goto end;
 	}
 	file_size = stat.st_size;
->>>>>>> lab6
 	if ((r = send_header(req, 200)) < 0)
 		goto end;
 
@@ -291,10 +272,6 @@ end:
 static void
 handle_client(int sock)
 {
-<<<<<<< HEAD
-=======
-	cprintf("handle client\n");
->>>>>>> lab6
 	struct http_request con_d;
 	int r;
 	char buffer[BUFFSIZE];

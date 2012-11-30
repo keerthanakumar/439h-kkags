@@ -15,10 +15,6 @@ announce(void)
 	// for this, but QEMU's ARP implementation is dumb and only
 	// listens for very specific ARP requests, such as requests
 	// for the gateway IP.
-<<<<<<< HEAD
-
-=======
->>>>>>> lab6
 	uint8_t mac[6] = {0x52, 0x54, 0x00, 0x12, 0x34, 0x56};
 	uint32_t myip = inet_addr(IP);
 	uint32_t gwip = inet_addr(DEFAULT);
@@ -42,10 +38,6 @@ announce(void)
 	memset(arp->dhwaddr.addr,  0x00,  ETHARP_HWADDR_LEN);
 	memcpy(arp->dipaddr.addrw, &gwip, 4);
 
-<<<<<<< HEAD
-=======
-	cprintf("net/testinput.c, announce(): about to call ipc_send\n");
->>>>>>> lab6
 	ipc_send(output_envid, NSREQ_OUTPUT, pkt, PTE_P|PTE_W|PTE_U);
 	sys_page_unmap(0, pkt);
 }
@@ -79,34 +71,18 @@ umain(int argc, char **argv)
 
 	binaryname = "testinput";
 
-<<<<<<< HEAD
-=======
-	cprintf("net/testinput.c: about to call output fork\n");
->>>>>>> lab6
 	output_envid = fork();
 	if (output_envid < 0)
 		panic("error forking");
 	else if (output_envid == 0) {
-<<<<<<< HEAD
 		output(ns_envid);
 		return;
 	}
 
-=======
-		cprintf("net/testinput.c: output child after fork, about to call output\n");
-		output(ns_envid);
-		return;
-	}
-	cprintf("net/testinput.c: parent after fork, about to call input fork\n");
->>>>>>> lab6
 	input_envid = fork();
 	if (input_envid < 0)
 		panic("error forking");
 	else if (input_envid == 0) {
-<<<<<<< HEAD
-=======
-		cprintf("net/testinput.c: input child after fork, about to call input\n");
->>>>>>> lab6
 		input(ns_envid);
 		return;
 	}
@@ -115,20 +91,10 @@ umain(int argc, char **argv)
 	announce();
 
 	while (1) {
-<<<<<<< HEAD
 		envid_t whom;
 		int perm;
 
 		int32_t req = ipc_recv((int32_t *)&whom, pkt, &perm);
-=======
-		cprintf("net/testinput.c: while loop iteration\n");
-		envid_t whom;
-		int perm;
-
-		cprintf("net/testinput.c: about to call ipc_recv\n");
-		int32_t req = ipc_recv((int32_t *)&whom, pkt, &perm);
-		cprintf("net/testinput.c: called ipc_recv, pkt->jp_len = %d\n", pkt->jp_len);
->>>>>>> lab6
 		if (req < 0)
 			panic("ipc_recv: %e", req);
 		if (whom != input_envid)
@@ -136,10 +102,6 @@ umain(int argc, char **argv)
 		if (req != NSREQ_INPUT)
 			panic("Unexpected IPC %d", req);
 
-<<<<<<< HEAD
-=======
-		cprintf("net/testinput.c: successful ipc_recv\n");
->>>>>>> lab6
 		hexdump("input: ", pkt->jp_data, pkt->jp_len);
 		cprintf("\n");
 

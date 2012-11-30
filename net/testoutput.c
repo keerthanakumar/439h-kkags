@@ -14,24 +14,12 @@ umain(int argc, char **argv)
 {
 	envid_t ns_envid = sys_getenvid();
 	int i, r;
-<<<<<<< HEAD
-
 	binaryname = "testoutput";
-=======
-	//cprintf("\n\nns_envid = %x\n\n", ns_envid);
-
-	binaryname = "testoutput";
-	//cprintf("\n\nlol\n\n");
->>>>>>> lab6
 
 	output_envid = fork();
 	if (output_envid < 0)
 		panic("error forking");
 	else if (output_envid == 0) {
-<<<<<<< HEAD
-=======
-		cprintf("net/testoutput.c: child starting\n");
->>>>>>> lab6
 		output(ns_envid);
 		return;
 	}
