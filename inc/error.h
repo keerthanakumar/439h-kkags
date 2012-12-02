@@ -30,6 +30,9 @@ enum {
 	E_RX_FULL	= 18,
 	E_RX_TRYAGAIN	= 19,
 
+//FOR BABIES
+	E_NO_FREE_THREAD = 20,
+
 	MAXERROR
 };
 

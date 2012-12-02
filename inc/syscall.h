@@ -21,6 +21,9 @@ enum {
 	SYS_net_send,
 	SYS_net_receive,
 	SYS_get_mac,
+	//CHANGE
+	SYS_tcreate,
+	//ENDCHANGE
 	NSYSCALLS
 };
 

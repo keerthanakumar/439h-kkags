@@ -14,6 +14,22 @@
 #include <kern/time.h>
 #include <kern/e1000.h>
 
+#include <env/thread.h>
+
+//CHANGE
+static int sys_tcreate(int ) {
+	panic("sys_tcreate() not yet implemented!");
+	switch(binary) {
+		case USER_HELLO:
+			THREAD_CREATE(user_hello, THREAD_TYPE_USER);
+			break;
+		default:
+			panic("kern/syscall.c: sys_tcreate(): unknown program enum");
+	}
+	return -1;
+}
+//ENDCHANGE
+
 // Print a string to the system console.
 // The string is exactly 'len' characters long.
 // Destroys the environment on memory errors.
@@ -494,6 +510,11 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 	int32_t return_value;
 	
 	switch(syscallno){
+		//CHANGE
+		case SYS_tcreate:
+			return_value = sys_tcreate((char*)a1);
+			break;
+		//ENDCHANGE
 		case SYS_cputs:
 			return_value = 0;
 			sys_cputs((char *) a1, (size_t) a2);
