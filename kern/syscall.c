@@ -14,17 +14,19 @@
 #include <kern/time.h>
 #include <kern/e1000.h>
 
-#include <env/thread.h>
-
 //CHANGE
-static int sys_tcreate(int ) {
-	panic("sys_tcreate() not yet implemented!");
-	switch(binary) {
+#include <env/thread.h>
+#include <inc/upids.h>
+
+static int sys_tcreate(int user_program_id) {
+	switch(user_program_id) {
 		case USER_HELLO:
+			cprintf("kern/syscall.c: sys_tcreate(): about to THREAD_CREATE user_hello\n");
 			THREAD_CREATE(user_hello, THREAD_TYPE_USER);
 			break;
 		default:
 			panic("kern/syscall.c: sys_tcreate(): unknown program enum");
+			break;
 	}
 	return -1;
 }
@@ -512,7 +514,7 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 	switch(syscallno){
 		//CHANGE
 		case SYS_tcreate:
-			return_value = sys_tcreate((char*)a1);
+			return_value = sys_tcreate((int)a1);
 			break;
 		//ENDCHANGE
 		case SYS_cputs:

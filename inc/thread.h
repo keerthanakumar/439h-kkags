@@ -22,7 +22,7 @@ enum {
 
 // Special environment types
 enum ThreadType {
-	THREAD_TYPE_BABY = 0,
+	THREAD_TYPE_USER = 0,
 	THREAD_TYPE_IDLE,
 	THREAD_TYPE_FS,		// File system server
 };

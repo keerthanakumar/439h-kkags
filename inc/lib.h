@@ -22,7 +22,10 @@
 #include <inc/args.h>
 #include <inc/malloc.h>
 #include <inc/ns.h>
+//CHANGE
 #include <inc/ulib.h>
+#include <inc/upids.h>
+//ENDCHANGE
 
 #define USED(x)		(void)(x)
 
@@ -46,7 +49,7 @@ char*	readline(const char *buf);
 
 // syscall.c
 //CHANGE
-int	sys_tcreate(char* binary);
+int	sys_tcreate(int user_program_id);
 //ENDCHANGE
 void	sys_cputs(const char *string, size_t len);
 int	sys_cgetc(void);
