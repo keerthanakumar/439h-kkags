@@ -175,15 +175,15 @@ void thread_destroy(struct Thread* t) {
 
 void thread_run (struct Thread* t) {
 //copied from kern/env.c: env_run(). KK HELP
-	if (curenv == NULL || curenv->env_id != e->env_id) {
-		if (curenv && curenv->env_status == ENV_RUNNING)				curenv->env_status = ENV_RUNNABLE;
-
-		curenv = e;
-		e->env_cpunum = cpunum();
-		e->env_status = ENV_RUNNING;
-		e->env_runs++;
-		lcr3(PADDR(e->env_pgdir));
-	}
+//	if (curenv == NULL || curenv->env_id != e->env_id) {
+//		if (curenv && curenv->env_status == ENV_RUNNING)				curenv->env_status = ENV_RUNNABLE;
+//
+//		curenv = e;
+//		e->env_cpunum = cpunum();
+//		e->env_status = ENV_RUNNING;
+//		e->env_runs++;
+//		lcr3(PADDR(e->env_pgdir));
+//	}
 
 //	unlock_kernel();
 //
