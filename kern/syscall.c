@@ -15,7 +15,7 @@
 #include <kern/e1000.h>
 
 //CHANGE
-#include <env/thread.h>
+#include <kern/thread.h>
 #include <inc/upids.h>
 
 static int sys_tcreate(int user_program_id) {

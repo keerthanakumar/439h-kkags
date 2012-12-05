@@ -1,3 +1,0 @@
-OBJDIRS += env
-
-ENV_SRCFILES :=	env/thread.c
