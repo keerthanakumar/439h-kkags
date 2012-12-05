@@ -49,7 +49,7 @@ char*	readline(const char *buf);
 
 // syscall.c
 //CHANGE
-int	sys_tcreate(int user_program_id);
+int	sys_tcreate(envid_t envid, uint32_t user_program_id);
 //ENDCHANGE
 void	sys_cputs(const char *string, size_t len);
 int	sys_cgetc(void);

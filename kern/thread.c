@@ -8,7 +8,9 @@
 struct Thread* thrds = NULL;
 static struct Thread* thread_free_list;
 
+//for initial thread setup
 void thread_init(void) {
+	//perhaps allocate memory for thrds
 	int i;
 	thread_free_list = NULL;
 	

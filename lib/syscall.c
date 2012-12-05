@@ -38,8 +38,8 @@ syscall(int num, int check, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 }
 
 //CHANGE
-int sys_tcreate(int user_program_id) {
-	return syscall(SYS_tcreate, (uint32_t)user_program_id, 0, 0, 0, 0, 0);
+int sys_tcreate(envid_t envid, uint32_t user_program_id) {
+	return syscall(SYS_tcreate, (uint32_t) envid, user_program_id, 0, 0, 0, 0);
 }
 //ENDCHANGE
 
