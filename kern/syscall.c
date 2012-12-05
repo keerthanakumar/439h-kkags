@@ -14,24 +14,6 @@
 #include <kern/time.h>
 #include <kern/e1000.h>
 
-//CHANGE
-#include <kern/thread.h>
-#include <inc/upids.h>
-
-static int sys_tcreate(envid_t envid, uint32_t user_program_id) {
-	switch(user_program_id) {
-		case USER_HELLO:
-			cprintf("kern/syscall.c: sys_tcreate(): about to THREAD_CREATE user_hello\n");
-			THREAD_CREATE(user_hello, THREAD_TYPE_USER);
-			break;
-		default:
-			panic("kern/syscall.c: sys_tcreate(): unknown program enum");
-			break;
-	}
-	return -1;
-}
-//ENDCHANGE
-
 // Print a string to the system console.
 // The string is exactly 'len' characters long.
 // Destroys the environment on memory errors.
@@ -512,11 +494,6 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 	int32_t return_value;
 	
 	switch(syscallno){
-		//CHANGE
-		case SYS_tcreate:
-			return_value = sys_tcreate((envid_t)a1, (uint32_t)a2);
-			break;
-		//ENDCHANGE
 		case SYS_cputs:
 			return_value = 0;
 			sys_cputs((char *) a1, (size_t) a2);

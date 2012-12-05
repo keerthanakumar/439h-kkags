@@ -37,12 +37,6 @@ syscall(int num, int check, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 	return ret;
 }
 
-//CHANGE
-int sys_tcreate(envid_t envid, uint32_t user_program_id) {
-	return syscall(SYS_tcreate, (uint32_t) envid, user_program_id, 0, 0, 0, 0);
-}
-//ENDCHANGE
-
 void
 sys_cputs(const char *s, size_t len)
 {

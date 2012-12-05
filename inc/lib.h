@@ -22,10 +22,7 @@
 #include <inc/args.h>
 #include <inc/malloc.h>
 #include <inc/ns.h>
-//CHANGE
 #include <inc/ulib.h>
-#include <inc/upids.h>
-//ENDCHANGE
 
 #define USED(x)		(void)(x)
 
@@ -48,9 +45,6 @@ void	set_pgfault_handler(void (*handler)(struct UTrapframe *utf));
 char*	readline(const char *buf);
 
 // syscall.c
-//CHANGE
-int	sys_tcreate(envid_t envid, uint32_t user_program_id);
-//ENDCHANGE
 void	sys_cputs(const char *string, size_t len);
 int	sys_cgetc(void);
 envid_t	sys_getenvid(void);
