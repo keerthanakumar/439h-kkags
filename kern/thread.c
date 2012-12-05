@@ -25,6 +25,7 @@ void thread_init(void) {
 }
 
 static int thread_setup_vm(struct Thread* t) {
+	panic("thread_setup_vm not yet implemented");
 	//KK HELP
 	return -1;
 }
@@ -83,13 +84,17 @@ static void load_icode(struct Thread* t, uint8_t* binary, size_t size) {
 }
 
 void thread_create(uint8_t* binary, size_t size, enum ThreadType type) {
+	if (!thrds) {
+		thread_init();
+		cprintf("threads initialized\n");
+	}
 	struct Thread* t;
-	if (thread_alloc(&t/*, 0*/) == 0) {
+	if (thread_alloc(&t/*, 0*/) == 0) { //the commented argument is from env parent id
 		load_icode(t, binary, size);
 		t->thread_type = type;
 	}
 	else {
-		panic("thread_create: unable to env_alloc()");
+		panic("thread_create: unable to thread_alloc()");
 	}
 }
 
