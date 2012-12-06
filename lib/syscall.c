@@ -139,9 +139,9 @@ sys_get_mac(uint32_t *low, uint32_t *high){
 	return syscall(SYS_get_mac, 1, (uint32_t) low, (uint32_t) high, 0, 0, 0);
 }
 
-int
-sys_get_binary_start(int name, uint8_t* n){
-	return syscall(SYS_get_binary_start, name, (int)n, 0, 0, 0, 0);
+uint8_t*
+sys_get_binary_start(int name) {
+	return (uint8_t*)syscall(SYS_get_binary_start, name, 0, 0, 0, 0, 0);
 }
 
 int sys_get_binary_size(int name){

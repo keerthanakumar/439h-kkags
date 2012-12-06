@@ -19,10 +19,12 @@
 #define THREAD_PASTE_START(x) _binary_obj_ ## x ## _start
 #define THREAD_PASTE_SIZE(x)  _binary_obj_ ## x ## _size
 
-#define THREAD_START(x)					\
-	extern uint8_t THREAD_PASTE_START(x)[];
-#define THREAD_SIZE(x)					\
-	extern uint8_t THREAD_PASTE_SIZE(x)[];
+#define RETURN_THREAD_START(x)					\
+	extern uint8_t THREAD_PASTE_START(x)[];		\
+	return THREAD_PASTE_START(x);
+#define RETURN_THREAD_SIZE(x)				\
+	extern uint8_t THREAD_PASTE_SIZE(x)[];		\
+	return (int)THREAD_PASTE_SIZE(x);
 //ENDCHANGE
 
 
@@ -496,26 +498,24 @@ sys_get_mac(uint32_t *low, uint32_t *high){
 	return 0;
 }
 
-static int
-sys_get_binary_start(int name, uint8_t *n){
-	switch(name) {
-	case USER_HELLO:
-		//cprintf("%p \n",THREAD_PASTE_START(user_hello));
-		break;
-	default:
-		return -11;
+
+static uint8_t*
+sys_get_binary_start(int name) {
+	if (name == USER_HELLO) {
+		RETURN_THREAD_START(user_hello);
 	}
-	return 0;
+	else {
+		return 0;
+	}
 }
 
 static int
 sys_get_binary_size(int name) {
-	switch(name) {
-	case USER_HELLO:
-		//cprintf("%d \n", THREAD_PASTE_SIZE(user_hello));
-		//return (int)THREAD_PASTE_SIZE(user_hello);
-	default:
-		return -11;
+	if (name == USER_HELLO) {
+		RETURN_THREAD_SIZE(user_hello);
+	}
+	else {
+		return -1;
 	}
 }
 
@@ -586,7 +586,7 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 			return_value = sys_get_mac((uint32_t *) a1, (uint32_t *)a2);
 			break;
 		case SYS_get_binary_start:
-			return_value = sys_get_binary_start((int)a1, (uint8_t*)a2);
+			return_value = (int)sys_get_binary_start((int)a1);
 			break;
 		case SYS_get_binary_size:
 			return_value = sys_get_binary_size((int)a1);

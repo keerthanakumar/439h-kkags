@@ -362,7 +362,6 @@ region_alloc(struct Env *e, void *va, size_t len)
 static void
 load_icode(struct Env *e, uint8_t *binary, size_t size)
 {
-	cprintf("kern/env.c: load_icode() called\n");
 	// Hints:
 	//  Load each program segment into virtual memory
 	//  at the address specified in the ELF section header.
@@ -402,22 +401,13 @@ load_icode(struct Env *e, uint8_t *binary, size_t size)
 	ph = (struct Proghdr*)((uint8_t*)elf+ elf->e_phoff);
 	eph = ph + elf->e_phnum;
 	lcr3(PADDR(e->env_pgdir));
-	cprintf("\tlcr3() success\n");
 	for (; ph < eph; ph++) {
-		cprintf("\tfor loop, ph = %p\n", ph);
 		if (ph->p_type == ELF_PROG_LOAD) {
-			cprintf("\t  ph->p_type = ELF_PROG_LOAD\n");
-			cprintf("\t  region_alloc(va: %p, size: 0x%08x)\n", (void*) ph->p_va, ph->p_memsz);
 			region_alloc(e,(void*)ph->p_va, ph->p_memsz);
-			cprintf("\t  region_alloc() success\n");
-			cprintf("\t  about to call memmove(%p, %p, 0x%x)\n", ph->p_va, binary + ph->p_offset, ph->p_filesz);
 			memmove((void *)ph->p_va, binary + ph->p_offset, ph->p_filesz);
-			cprintf("\t  memmove() success\n");
 			memset((void *)ph->p_va + ph->p_filesz, 0, ph->p_memsz - ph->p_filesz);
-			cprintf("\t  memset() success\n");
 		}
 	}
-	cprintf("\tfor loop success\n");
 
 	e->env_tf.tf_eip = elf->e_entry;
 
@@ -425,9 +415,7 @@ load_icode(struct Env *e, uint8_t *binary, size_t size)
 	// at virtual address USTACKTOP - PGSIZE.
 
 	region_alloc(e, (void*)(USTACKTOP - PGSIZE), PGSIZE);
-	cprintf("\tregion_alloc() success\n");
 	lcr3(PADDR(kern_pgdir));
-	cprintf("\tload_icode() success\n");
 }
 
 
@@ -441,17 +429,13 @@ load_icode(struct Env *e, uint8_t *binary, size_t size)
 void
 env_create(uint8_t *binary, size_t size, enum EnvType type)
 {
-	cprintf("kern/env.c: env_create() called\n");
 	struct Env* e;
 	if (env_alloc(&e, 0) == 0) {
-		cprintf("\tenv_alloc() success\n");
 		load_icode(e, binary, size);
-		cprintf("\tload_icode() success\n");
 		e->env_type = type;
 		if (type == ENV_TYPE_FS) {
 			e->env_tf.tf_eflags |= FL_IOPL_MASK;
 		}
-		cprintf("\tenv_create() success\n");
 	}
 	else {
 		panic("env_create: unable to env_alloc()");

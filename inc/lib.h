@@ -65,7 +65,7 @@ unsigned int sys_time_msec(void);
 int	sys_net_send(char* data, int len);
 int 	sys_net_receive(char* data);//, int* len
 int	sys_get_binary_size(int name); //enum from inc/thread.h
-int	sys_get_binary_start(int name, uint8_t* n); //T 
+uint8_t*	sys_get_binary_start(int name); //T 
 
 //CHANGE
 static threadid_t sys_threadfork(void);
