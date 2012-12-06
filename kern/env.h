@@ -29,13 +29,11 @@ void	env_pop_tf(struct Trapframe *tf) __attribute__((noreturn));
 
 #define ENV_CREATE(x, type)						\
 	do {								\
-cprintf("ENV_CREATE do-while\n"); \
 		extern uint8_t ENV_PASTE3(_binary_obj_, x, _start)[],	\
 			ENV_PASTE3(_binary_obj_, x, _size)[];		\
 		env_create(ENV_PASTE3(_binary_obj_, x, _start),		\
 			   (int)ENV_PASTE3(_binary_obj_, x, _size),	\
 			   type);					\
-cprintf("ENV_CREATE end of do-while\n"); \
 	} while (0)
 
 #endif // !JOS_KERN_ENV_H

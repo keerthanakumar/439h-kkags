@@ -18,7 +18,13 @@
 //CHANGE
 #define THREAD_PASTE_START(x) _binary_obj_ ## x ## _start
 #define THREAD_PASTE_SIZE(x)  _binary_obj_ ## x ## _size
+
+#define THREAD_START(x)					\
+	extern uint8_t THREAD_PASTE_START(x)[];
+#define THREAD_SIZE(x)					\
+	extern uint8_t THREAD_PASTE_SIZE(x)[];
 //ENDCHANGE
+
 
 // Print a string to the system console.
 // The string is exactly 'len' characters long.
