@@ -21,6 +21,8 @@ enum {
 	SYS_net_send,
 	SYS_net_receive,
 	SYS_get_mac,
+	SYS_get_binary_start,
+	SYS_get_binary_size,
 	NSYSCALLS
 };
 

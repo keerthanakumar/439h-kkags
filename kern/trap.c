@@ -314,7 +314,7 @@ page_fault_handler(struct Trapframe *tf)
 
 	// LAB 3: Your code here.
 	if (tf->tf_cs == GD_KT) {
-		panic("kernel-mode page fault");
+		panic("kernel-mode page fault. Addr: 0x%08x", fault_va);
 	}
 	
 	// We've already handled kernel-mode exceptions, so if we get here,

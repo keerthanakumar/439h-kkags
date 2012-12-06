@@ -75,14 +75,17 @@ i386_init(void)
 #if !defined(TEST_NO_NS)
 	// Start ns.
 	ENV_CREATE(net_ns, ENV_TYPE_NS);
+	cprintf("created ns env\n");
 #endif
 
 #if defined(TEST)
 	// Don't touch -- used by grading script!
 	ENV_CREATE(TEST, ENV_TYPE_USER);
+	cprintf("created TEST env\n");
 #else
 	// Touch all you want.
 	ENV_CREATE(user_icode, ENV_TYPE_USER);
+	cprintf("created user_icode env\n");
 
 	// Should not be necessary - drains keyboard because interrupt has given up.
 	kbd_intr();

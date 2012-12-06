@@ -20,6 +20,11 @@ enum {
 	THREAD_NOT_RUNNABLE
 };
 
+
+enum UserProgramIds {
+	USER_HELLO = 0,
+	NUM_ID_USER_PROGRAMS
+};
 // Special environment types
 enum ThreadType {
 	THREAD_TYPE_USER = 0,

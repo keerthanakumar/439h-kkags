@@ -2,6 +2,7 @@
 
 #include <inc/syscall.h>
 #include <inc/lib.h>
+#include <inc/thread.h>
 
 static inline int32_t
 syscall(int num, int check, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, uint32_t a5)
@@ -136,4 +137,13 @@ sys_net_receive(char* data) {
 int 
 sys_get_mac(uint32_t *low, uint32_t *high){
 	return syscall(SYS_get_mac, 1, (uint32_t) low, (uint32_t) high, 0, 0, 0);
+}
+
+int
+sys_get_binary_start(int name, uint8_t* n){
+	return syscall(SYS_get_binary_start, name, (int)n, 0, 0, 0, 0);
+}
+
+int sys_get_binary_size(int name){
+	return syscall(SYS_get_binary_size, name, 0, 0, 0, 0, 0);
 }

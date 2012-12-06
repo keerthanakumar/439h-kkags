@@ -23,6 +23,7 @@
 #include <inc/malloc.h>
 #include <inc/ns.h>
 #include <inc/ulib.h>
+#include <inc/thread.h>
 
 #define USED(x)		(void)(x)
 
@@ -62,7 +63,9 @@ int	sys_ipc_try_send(envid_t to_env, uint32_t value, void *pg, int perm);
 int	sys_ipc_recv(void *rcv_pg);
 unsigned int sys_time_msec(void);
 int	sys_net_send(char* data, int len);
-int 	sys_net_receive(char* data);//, int* len);
+int 	sys_net_receive(char* data);//, int* len
+int	sys_get_binary_size(int name); //enum from inc/thread.h
+int	sys_get_binary_start(int name, uint8_t* n); //T 
 
 //CHANGE
 static threadid_t sys_threadfork(void);

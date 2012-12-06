@@ -4,6 +4,7 @@
 #include <inc/error.h>
 #include <inc/string.h>
 #include <inc/assert.h>
+#include <inc/thread.h>
 
 #include <kern/env.h>
 #include <kern/pmap.h>
@@ -13,6 +14,11 @@
 #include <kern/sched.h>
 #include <kern/time.h>
 #include <kern/e1000.h>
+
+//CHANGE
+#define THREAD_PASTE_START(x) _binary_obj_ ## x ## _start
+#define THREAD_PASTE_SIZE(x)  _binary_obj_ ## x ## _size
+//ENDCHANGE
 
 // Print a string to the system console.
 // The string is exactly 'len' characters long.
@@ -484,6 +490,29 @@ sys_get_mac(uint32_t *low, uint32_t *high){
 	return 0;
 }
 
+static int
+sys_get_binary_start(int name, uint8_t *n){
+	switch(name) {
+	case USER_HELLO:
+		//cprintf("%p \n",THREAD_PASTE_START(user_hello));
+		break;
+	default:
+		return -11;
+	}
+	return 0;
+}
+
+static int
+sys_get_binary_size(int name) {
+	switch(name) {
+	case USER_HELLO:
+		//cprintf("%d \n", THREAD_PASTE_SIZE(user_hello));
+		//return (int)THREAD_PASTE_SIZE(user_hello);
+	default:
+		return -11;
+	}
+}
+
 // Dispatches to the correct kernel function, passing the arguments.
 int32_t
 syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, uint32_t a5)
@@ -549,6 +578,12 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 			break;
 		case SYS_get_mac:
 			return_value = sys_get_mac((uint32_t *) a1, (uint32_t *)a2);
+			break;
+		case SYS_get_binary_start:
+			return_value = sys_get_binary_start((int)a1, (uint8_t*)a2);
+			break;
+		case SYS_get_binary_size:
+			return_value = sys_get_binary_size((int)a1);
 			break;
 		default:
 			return_value = -E_INVAL;
